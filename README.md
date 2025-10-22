@@ -1,2 +1,2 @@
-# Sistema-Gest-o-RU
+# RU Digital
 Projeto desenvolvido para a disciplina de Engenharia de Software da Universidade Federal de Catalão (UFCAT).  O sistema tem como objetivo gerenciar o Restaurante Universitário (RU)
