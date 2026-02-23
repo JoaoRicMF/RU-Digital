@@ -1,283 +1,185 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // ==========================================================================
-    // 1. ESTADO GLOBAL (Simulação de Backend)
-    // ==========================================================================
+    // 1. ESTADO GLOBAL
     const appState = {
-        user: {
-            name: "João",
-            balance: 24.00
-        },
+        user: { name: "João", balance: 24.00 },
         transactions: [
-            { id: 1, date: new Date('2026-02-01'), type: 'Recarga - PIX', value: 20.00, isIncome: true },
-            { id: 2, date: new Date('2026-01-31'), type: 'Refeição - Jantar', value: 4.00, isIncome: false },
-            { id: 3, date: new Date('2026-01-31'), type: 'Refeição - Almoço', value: 4.00, isIncome: false },
+            { id: 1, date: '02 FEV', type: 'Refeição - Almoço', value: 4.00, isIncome: false },
+            { id: 2, date: '01 FEV', type: 'Recarga - PIX', value: 20.00, isIncome: true },
+            { id: 3, date: '31 JAN', type: 'Refeição - Jantar', value: 4.00, isIncome: false },
+            { id: 4, date: '31 JAN', type: 'Refeição - Almoço', value: 4.00, isIncome: false },
+            { id: 5, date: '28 JAN', type: 'Refeição - Almoço', value: 4.00, isIncome: false },
+            { id: 6, date: '29 JAN', type: 'Recarga - Cartão', value: 20.00, isIncome: true },
         ]
     };
 
-    // Formatador de Moeda (BRL)
-    const currencyFormatter = new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    });
+    const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
-    // Formatador de Data (Ex: 02 FEV)
-    const dateFormatter = (dateObj) => {
-        const day = String(dateObj.getDate()).padStart(2, '0');
-        const month = dateObj.toLocaleString('pt-BR', { month: 'short' }).toUpperCase().replace('.', '');
-        return `${day} ${month}`;
-    };
-
-    // ==========================================================================
-    // 2. FUNÇÕES DE RENDERIZAÇÃO (UI)
-    // ==========================================================================
-
-    // Atualiza o saldo na tela inicial
+    // 2. RENDERIZAÇÃO
     function updateBalanceUI() {
-        const balanceDisplays = document.querySelectorAll('.balance-display');
-        if (!balanceDisplays.length) return; // Proteção contra quebra
-
-        balanceDisplays.forEach(el => {
+        document.querySelectorAll('.balance-display').forEach(el => {
             el.textContent = currencyFormatter.format(appState.user.balance);
         });
     }
 
-    // Renderiza a lista do extrato/carteira
     function renderTransactions() {
         const listContainer = document.getElementById('transaction-list');
-        if (!listContainer) return; // Proteção contra quebra
+        if (!listContainer) return;
+        listContainer.innerHTML = ''; 
 
-        listContainer.innerHTML = ''; // Limpa a lista atual
-
-        // Ordena por data (mais recente primeiro)
-        const sortedTransactions = [...appState.transactions].sort((a, b) => b.date - a.date);
-
-        sortedTransactions.forEach(t => {
+        appState.transactions.forEach(t => {
             const row = document.createElement('div');
-            row.className = `transaction-item ${t.isIncome ? 'income' : 'expense'}`;
-            
-            // Adiciona sinal de + ou - dependendo do tipo da transação
-            const prefix = t.isIncome ? '+' : '-';
-
-            row.innerHTML = `
-                <div class="trans-info">${dateFormatter(t.date)} | ${t.type}</div>
-                <div class="trans-value">${prefix} ${currencyFormatter.format(t.value)}</div>
-            `;
+            row.className = `transaction-item ${t.isIncome ? 'trans-income' : 'trans-expense'}`;
+            row.innerHTML = `${t.date} | ${t.type} - ${currencyFormatter.format(t.value)}`;
             listContainer.appendChild(row);
         });
     }
 
-    // Inicializa a interface com os dados do Estado
     function initUI() {
         updateBalanceUI();
         renderTransactions();
     }
 
-    // ==========================================================================
-    // 3. SISTEMA DE NAVEGAÇÃO
-    // ==========================================================================
+    // 3. NAVEGAÇÃO
     const navItems = document.querySelectorAll('.nav-item');
     const views = document.querySelectorAll('.view');
     const mainContent = document.getElementById('main-content');
 
-    function navigateTo(targetId) {
-        // Atualiza estilo dos botões da nav
-        navItems.forEach(nav => {
-            nav.classList.toggle('active', nav.getAttribute('data-target') === targetId);
-        });
-
-        // Alterna a exibição das views (seções)
-        views.forEach(view => {
-            view.classList.toggle('active', view.id === targetId);
-        });
-
-        // Reseta o scroll ao mudar de aba
+    window.navigateTo = function(targetId) {
+        navItems.forEach(nav => nav.classList.toggle('active', nav.getAttribute('data-target') === targetId));
+        views.forEach(view => view.classList.toggle('active', view.id === targetId));
         if (mainContent) mainContent.scrollTop = 0;
-    }
+    };
 
-    // Vincula clique aos itens do menu inferior
     navItems.forEach(item => {
         item.addEventListener('click', () => {
             const targetId = item.getAttribute('data-target');
-            if (targetId) navigateTo(targetId);
+            if (targetId) window.navigateTo(targetId);
         });
     });
 
-    // Expondo globalmente caso precise navegar por botões internos (ex: após avaliar)
-    window.navigateTo = navigateTo;
+    // 4. FUNCIONALIDADES
+    // --- Lógica do Modal Nutricional ---
+    const nutritionModal = document.getElementById('nutrition-modal');
+    document.getElementById('btn-nutrition')?.addEventListener('click', () => {
+        nutritionModal.classList.add('open');
+    });
+    
+    // Modifiquei para buscar especificamente o botão fechar do modal nutricional
+    document.querySelector('#nutrition-modal .close-modal')?.addEventListener('click', () => {
+        nutritionModal.classList.remove('open');
+    });
 
-    // ==========================================================================
-    // 4. FUNCIONALIDADES INTERATIVAS
-    // ==========================================================================
+    // --- Lógica do Novo Modal de Recarga ---
+    const rechargeModal = document.getElementById('recharge-modal');
+    const rechargeInput = document.getElementById('recharge-input-value');
+    
+    // 1. Abrir Modal de Recarga ao clicar nos botões "Fazer Recarga"
+    document.querySelectorAll('.btn-recharge').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if(rechargeInput) rechargeInput.value = ''; // Limpa o campo sempre que abrir
+            rechargeModal.classList.add('open');
+        });
+    });
 
-    // --- Lógica de Recarga ---
-    function handleRecharge() {
-        const input = window.prompt("Digite o valor da recarga (Ex: 20.00):");
-        if (input === null) return; // Usuário cancelou
+    // 2. Fechar Modal de Recarga no 'X'
+    document.getElementById('close-recharge')?.addEventListener('click', () => {
+        rechargeModal.classList.remove('open');
+    });
 
-        const value = parseFloat(input.replace(',', '.')); // Aceita vírgula ou ponto
+    // 3. Processar a Recarga ao clicar em "Confirmar"
+    document.getElementById('btn-confirm-recharge')?.addEventListener('click', () => {
+        const inputValue = rechargeInput.value;
+        if (!inputValue) return; // Se estiver vazio, não faz nada
+        
+        // Aceita vírgula ou ponto
+        const value = parseFloat(inputValue.replace(',', '.')); 
 
         if (!isNaN(value) && value > 0) {
             // Atualiza Estado
             appState.user.balance += value;
             appState.transactions.unshift({
-                id: Date.now(),
-                date: new Date(),
-                type: 'Recarga - App',
-                value: value,
+                id: Date.now(), 
+                date: 'HOJE', 
+                type: 'Recarga - App', 
+                value: value, 
                 isIncome: true
             });
-
+            
             // Atualiza UI
-            updateBalanceUI();
+            updateBalanceUI(); 
             renderTransactions();
             
+            // Fecha modal e avisa
+            rechargeModal.classList.remove('open');
             alert(`Recarga de ${currencyFormatter.format(value)} realizada com sucesso!`);
         } else {
-            alert("Valor inválido. Por favor, insira um número positivo.");
+            alert("Valor inválido. Por favor, insira um número maior que zero.");
         }
-    }
+    });
 
-    const rechargeBtns = document.querySelectorAll('.btn-recharge');
-    rechargeBtns.forEach(btn => btn.addEventListener('click', handleRecharge));
-
-    // --- Lógica de Avaliação (Estrelas) ---
-    const stars = document.querySelectorAll('.interactive-stars i');
-    let currentRating = 0; // Estado local da avaliação
-
-    stars.forEach(star => {
-        star.addEventListener('click', function() {
-            currentRating = parseInt(this.getAttribute('data-val'));
-            
-            // Pinta as estrelas dinamicamente
-            stars.forEach(s => {
-                const sVal = parseInt(s.getAttribute('data-val'));
-                if (sVal <= currentRating) {
-                    s.className = 'fa-solid fa-star active';
-                } else {
-                    s.className = 'fa-regular fa-star';
-                }
-            });
+    // --- Fechar qualquer modal ao clicar fora dele (Overlay) ---
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            // Garante que o clique foi no fundo escuro, e não no conteúdo branco
+            if (e.target === modal) {
+                modal.classList.remove('open');
+            }
         });
     });
 
-    // --- Envio da Avaliação ---
-    const submitRatingBtn = document.getElementById('btn-submit-rating');
-    const commentBox = document.querySelector('.comment-box');
-
-    if (submitRatingBtn) {
-        submitRatingBtn.addEventListener('click', () => {
-            if (currentRating > 0) {
-                alert("Avaliação enviada com sucesso! Obrigado pelo seu feedback.");
-                
-                // Reseta o formulário
-                currentRating = 0;
-                stars.forEach(s => s.className = 'fa-regular fa-star');
-                if (commentBox) commentBox.value = "";
-                
-                // Retorna para a Home
-                navigateTo('view-home');
-            } else {
-                alert("Por favor, selecione uma nota clicando nas estrelas antes de enviar.");
-            }
+    // --- Interações do Cabeçalho (Header) ---
+    
+    // 1. Botão de Perfil: Redireciona para a aba de perfil
+    const btnProfileHeader = document.getElementById('btn-profile-header');
+    if (btnProfileHeader) {
+        btnProfileHeader.addEventListener('click', () => {
+            window.navigateTo('view-profile'); // Reaproveita a função de navegação existente
         });
     }
 
-    // --- Lógica do Modal Nutricional ---
-    const nutritionModal = document.getElementById('nutrition-modal');
-    const btnNutrition = document.getElementById('btn-nutrition');
-    const closeBtn = document.querySelector('.close-modal');
-    
-    function toggleModal(show) {
-        if (!nutritionModal) return;
-        nutritionModal.classList.toggle('open', show);
-    }
+    // 2. Botão de Sino: Abre e fecha o modal de notificações
+    const notificationModal = document.getElementById('notification-modal');
+    const btnNotifications = document.getElementById('btn-notifications');
+    const closeNotifications = document.getElementById('close-notifications');
 
-    if (btnNutrition) btnNutrition.addEventListener('click', () => toggleModal(true));
-    if (closeBtn) closeBtn.addEventListener('click', () => toggleModal(false));
-    
-    // Fechar ao clicar fora do modal
-    if (nutritionModal) {
-        nutritionModal.addEventListener('click', (e) => {
-            if (e.target === nutritionModal) toggleModal(false);
+    if (btnNotifications) {
+        btnNotifications.addEventListener('click', () => {
+            notificationModal.classList.add('open');
         });
     }
 
-    // ==========================================================================
-    // 5. AUTENTICAÇÃO (Login / Logout / LocalStorage)
-    // ==========================================================================
-    
-    // Credenciais simuladas (Mock)
+    if (closeNotifications) {
+        closeNotifications.addEventListener('click', () => {
+            notificationModal.classList.remove('open');
+        });
+    }
+
+    // 5. AUTENTICAÇÃO
     const VALID_USER = { email: "joao@ufcat.edu.br", password: "123456" };
-
-    // Elementos da UI de Autenticação
-    const loginView = document.getElementById('view-login');
-    const appHeader = document.getElementById('app-header');
-    const bottomNav = document.getElementById('bottom-nav');
+    const loginView = document.getElementById('view-login'), appHeader = document.getElementById('app-header'), bottomNav = document.getElementById('bottom-nav');
     
-    const inputEmail = document.getElementById('login-email');
-    const inputPassword = document.getElementById('login-password');
-    const loginError = document.getElementById('login-error');
-    const btnLogin = document.getElementById('btn-login');
-    const btnLogout = document.getElementById('btn-logout');
-
-    // Verifica se já existe uma sessão ativa
     function checkAuth() {
-        const isLoggedIn = localStorage.getItem('ru_digital_logged_in') === 'true';
-        if (isLoggedIn) {
-            showApp();
+        if (localStorage.getItem('ru_digital_logged_in') === 'true') {
+            loginView.classList.add('d-none'); appHeader.classList.remove('d-none'); mainContent.classList.remove('d-none'); bottomNav.classList.remove('d-none'); window.navigateTo('view-home');
         } else {
-            showLogin();
+            loginView.classList.remove('d-none'); appHeader.classList.add('d-none'); mainContent.classList.add('d-none'); bottomNav.classList.add('d-none');
         }
     }
 
-    function showApp() {
-        loginView.classList.add('d-none');
-        appHeader.classList.remove('d-none');
-        mainContent.classList.remove('d-none');
-        bottomNav.classList.remove('d-none');
-        navigateTo('view-home'); // Força a renderização inicial na tela Home
-    }
+    document.getElementById('btn-login')?.addEventListener('click', () => {
+        if (document.getElementById('login-email').value.trim() === VALID_USER.email && document.getElementById('login-password').value.trim() === VALID_USER.password) {
+            localStorage.setItem('ru_digital_logged_in', 'true'); checkAuth();
+        } else {
+            document.getElementById('login-error').classList.remove('d-none');
+        }
+    });
 
-    function showLogin() {
-        loginView.classList.remove('d-none');
-        appHeader.classList.add('d-none');
-        mainContent.classList.add('d-none');
-        bottomNav.classList.add('d-none');
-        loginError.classList.add('d-none'); // Reseta o erro
-    }
+    document.getElementById('btn-logout')?.addEventListener('click', () => {
+        localStorage.removeItem('ru_digital_logged_in'); 
+        document.getElementById('login-email').value = ''; document.getElementById('login-password').value = '';
+        checkAuth();
+    });
 
-    // Ação de Login
-    if (btnLogin) {
-        btnLogin.addEventListener('click', () => {
-            const email = inputEmail.value.trim();
-            const password = inputPassword.value.trim();
-
-            if (email === VALID_USER.email && password === VALID_USER.password) {
-                localStorage.setItem('ru_digital_logged_in', 'true');
-                showApp();
-            } else {
-                loginError.classList.remove('d-none');
-            }
-        });
-    }
-
-    // Ação de Logout
-    if (btnLogout) {
-        btnLogout.addEventListener('click', () => {
-            localStorage.removeItem('ru_digital_logged_in');
-            // Limpa os campos do formulário para o próximo login
-            inputEmail.value = '';
-            inputPassword.value = '';
-            showLogin();
-        });
-    }
-
-    // Chama a verificação logo que a página carrega
-    checkAuth();
-
-    // ==========================================================================
-    // 6. BOOTSTRAP (Start)
-    // ==========================================================================
-    initUI();
+    checkAuth(); initUI();
 });
