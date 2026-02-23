@@ -1,35 +1,43 @@
-/* --- Variáveis e Reset --- */
+/* ==========================================================================
+   1. VARIÁVEIS DE TEMA
+   ========================================================================== */
 :root {
-    --primary-color: #2E7D75;      /* Verde Petróleo */
+    --primary-color: #2E7D75;      /* Verde Petróleo UFCAT */
     --accent-color: #F06E3E;       /* Laranja */
     --bg-color: #F5F5F5;           /* Cinza Fundo */
     --card-bg: #FFFFFF;            /* Branco */
     --text-dark: #333333;
     --text-light: #757575;
-    --success-color: #4CAF50;      /* Verde para Entradas */
+    --success-color: #4CAF50;      /* Verde para Entradas/Sucesso */
     --border-radius: 12px;
     --shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
+/* ==========================================================================
+   2. RESET
+   ========================================================================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: 'Roboto', sans-serif;
-    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: transparent; /* Remove highlight azulado no mobile */
 }
 
+/* ==========================================================================
+   3. LAYOUT BASE
+   ========================================================================== */
 body {
-    background-color: #e0e0e0; /* Fundo do desktop para contraste */
+    background-color: #e0e0e0; /* Fundo escuro no desktop para criar contraste */
     display: flex;
-    justify-content: center;
+    justify-content: center; /* Centraliza o contêiner do app no meio da tela */
     min-height: 100vh;
 }
 
-/* --- Container Mobile --- */
+/* Container que simula a tela do celular */
 .app-container {
     width: 100%;
-    max-width: 480px;
+    max-width: 480px; 
     background-color: var(--bg-color);
     min-height: 100vh;
     position: relative;
@@ -38,17 +46,17 @@ body {
     flex-direction: column;
 }
 
-/* --- Header --- */
+/* Cabeçalho Fixo */
 .app-header {
     background: var(--card-bg);
-    padding: 10px 20px; /* Reduzi um pouco o padding vertical */
+    padding: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: sticky;
     top: 0;
     z-index: 100;
-    height: 65px; /* Altura fixa para garantir estabilidade */
+    height: 65px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
@@ -57,14 +65,14 @@ body {
     align-items: center;
     justify-content: center;
     height: 100%;
-    flex-grow: 1; /* Ocupa o espaço central */
+    flex-grow: 1;
 }
 
 .logo-img {
-    height: 100%; /* Ocupa a altura disponível do container */
-    max-height: 45px; /* Limite máximo para não estourar */
-    width: auto;      /* Mantém a proporção da imagem */
-    object-fit: contain; /* Garante que a imagem inteira apareça */
+    height: 100%;
+    max-height: 45px;
+    width: auto;
+    object-fit: contain;
 }
 
 .logo-text {
@@ -79,18 +87,54 @@ body {
     font-size: 1.2rem;
     color: var(--text-dark);
     cursor: pointer;
-    width: 24px; /* Largura fixa para ajudar na centralização da logo */
+    width: 24px;
     text-align: center;
 }
 
-/* --- Conteúdo Principal --- */
+/* Área de Rolagem do Aplicativo */
 #main-content {
     flex: 1;
     padding: 20px;
-    padding-bottom: 90px; /* Espaço para a nav bar */
+    padding-bottom: 90px; /* Garante que a navbar não tampe o conteúdo */
     overflow-y: auto;
 }
 
+/* Barra de Navegação Inferior */
+.bottom-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: var(--card-bg);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #eee;
+    z-index: 200;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 0.8rem;
+    gap: 5px;
+    width: 20%;
+}
+
+.nav-item i {
+    font-size: 1.2rem;
+    margin-bottom: 2px;
+}
+
+.nav-item.active {
+    color: var(--primary-color);
+}
+
+/* Ocultar telas inativas */
 .view {
     display: none;
     animation: fadeIn 0.3s ease;
@@ -100,12 +144,11 @@ body {
     display: block;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+/* ==========================================================================
+   4. COMPONENTES
+   ========================================================================== */
 
-/* --- Cards e Componentes Gerais --- */
+/* --- Cartões (Cards) --- */
 .card {
     background: var(--card-bg);
     border-radius: var(--border-radius);
@@ -114,16 +157,36 @@ body {
     box-shadow: var(--shadow);
 }
 
-.card-title, .card-title-lg {
+/* --- Tipografia Global --- */
+.card-title, .card-title-lg, .section-title {
     color: var(--primary-color);
     font-weight: 700;
+}
+
+.card-title {
+    font-size: 1.1rem;
     margin-bottom: 10px;
 }
 
-.card-title { font-size: 1.1rem; }
-.card-title-lg { font-size: 1.2rem; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+.card-title-lg {
+    font-size: 1.2rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
 
-/* Botões */
+.section-title {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.greeting {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* --- Botões --- */
 .btn {
     display: block;
     width: 100%;
@@ -137,7 +200,9 @@ body {
     transition: opacity 0.2s;
 }
 
-.btn:active { opacity: 0.8; }
+.btn:active {
+    opacity: 0.8;
+}
 
 .btn-primary {
     background-color: var(--primary-color);
@@ -154,18 +219,9 @@ body {
     background-color: transparent;
     border: 1px solid #E53935;
     color: #E53935;
-    margin-top: 20px;
 }
 
-.mt-20 { margin-top: 20px; }
-
-/* --- Tela Início & Carteira --- */
-.greeting {
-    color: var(--primary-color);
-    font-weight: 700;
-    font-size: 1.1rem;
-}
-
+/* --- Elementos Específicos: Saldo --- */
 .balance-row {
     display: flex;
     justify-content: space-between;
@@ -185,6 +241,7 @@ body {
     font-size: 1.6rem;
 }
 
+/* --- Elementos Específicos: Cardápio --- */
 .menu-highlight {
     display: flex;
     align-items: flex-start;
@@ -193,35 +250,31 @@ body {
     color: var(--text-dark);
 }
 
-.icon-accent { color: var(--accent-color); margin-top: 3px;}
-
-.rating-date {
-    color: var(--text-dark);
-    font-size: 0.9rem;
-    margin-top: 10px;
+.icon-accent {
+    color: var(--accent-color);
+    margin-top: 3px;
 }
 
-.stars-static { color: var(--accent-color); }
+.menu-list {
+    list-style: none;
+}
 
-/* --- Tela Cardápio --- */
-.menu-list { list-style: none; }
 .menu-list li {
     padding: 12px 0;
     border-bottom: 1px solid #eee;
     color: var(--text-dark);
     font-size: 0.95rem;
 }
-.menu-list li:last-child { border-bottom: none; }
-.menu-cat { font-weight: 700; }
 
-/* --- Tela Carteira (Transações) --- */
-.section-title {
-    color: var(--primary-color);
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin-bottom: 10px;
+.menu-list li:last-child {
+    border-bottom: none;
 }
 
+.menu-cat {
+    font-weight: 700;
+}
+
+/* --- Elementos Específicos: Transações/Extrato --- */
 .transaction-item {
     display: flex;
     justify-content: space-between;
@@ -229,19 +282,27 @@ body {
     border-bottom: 1px solid #eee;
     font-size: 0.9rem;
 }
-.transaction-item:last-child { border-bottom: none; }
 
-.income { color: var(--success-color); font-weight: 500;}
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.income { color: var(--success-color); font-weight: 500; }
 .expense { color: var(--text-light); }
 
-/* --- Tela Avaliação --- */
+/* --- Elementos Específicos: Avaliação --- */
 .rating-question {
     color: var(--primary-color);
     font-size: 1.1rem;
     font-weight: 700;
     margin-top: 10px;
 }
-.rating-sub { color: #333; font-size: 0.9rem; margin-top: 5px; }
+
+.rating-sub {
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
 
 .rating-criteria {
     display: flex;
@@ -249,11 +310,23 @@ body {
     align-items: center;
     padding: 10px 0;
 }
-.rating-criteria span { font-weight: 500; font-size: 0.9rem; }
+
+.rating-criteria span {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
 
 .interactive-stars { cursor: pointer; }
-.interactive-stars i { font-size: 1.2rem; color: #ccc; margin-left: 2px; transition: color 0.2s;}
-.interactive-stars i.active { color: var(--accent-color); font-weight: 900; }
+.interactive-stars i {
+    font-size: 1.2rem;
+    color: #ccc;
+    margin-left: 2px;
+    transition: color 0.2s;
+}
+.interactive-stars i.active {
+    color: var(--accent-color);
+    font-weight: 900;
+}
 
 .comment-box {
     width: 100%;
@@ -266,11 +339,12 @@ body {
     font-size: 0.9rem;
 }
 
-/* --- Tela Perfil --- */
+/* --- Elementos Específicos: Perfil --- */
 .profile-header {
     text-align: center;
     margin-bottom: 30px;
 }
+
 .avatar-circle {
     width: 80px;
     height: 80px;
@@ -281,11 +355,28 @@ body {
     justify-content: center;
     margin: 0 auto 15px auto;
 }
-.avatar-circle i { color: white; font-size: 2.5rem; }
-.profile-name { color: #1a1a1a; font-size: 1.3rem; font-weight: 700; }
-.profile-course { color: var(--text-light); font-size: 0.9rem; }
 
-.profile-menu { padding: 0; overflow: hidden; }
+.avatar-circle i {
+    color: white;
+    font-size: 2.5rem;
+}
+
+.profile-name {
+    color: #1a1a1a;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.profile-course {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.profile-menu {
+    padding: 0;
+    list-style: none; /* Adicionado para limpar os bullet points do HTML */
+}
+
 .profile-item {
     padding: 15px 20px;
     border-bottom: 1px solid #eee;
@@ -295,43 +386,20 @@ body {
     font-weight: 500;
     cursor: pointer;
 }
-.profile-item:last-child { border-bottom: none; }
-.profile-item:active { background-color: #f9f9f9; }
 
-/* --- Bottom Navigation --- */
-.bottom-nav {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 70px;
-    background: white;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 1px solid #eee;
-    z-index: 200;
+.profile-item:last-child {
+    border-bottom: none;
 }
 
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: var(--text-light);
-    cursor: pointer;
-    font-size: 0.8rem;
-    gap: 5px;
-    width: 20%;
+.profile-item:active {
+    background-color: #f9f9f9;
 }
 
-.nav-item i { font-size: 1.2rem; margin-bottom: 2px; }
-
-.nav-item.active {
-    color: var(--primary-color);
-}
-/* --- Modal Overlay --- */
+/* ==========================================================================
+   5. MODAIS
+   ========================================================================== */
 .modal-overlay {
-    display: none; /* Oculto por padrão */
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -349,7 +417,7 @@ body {
 }
 
 .modal-content {
-    background: white;
+    background: var(--card-bg);
     width: 90%;
     max-width: 350px;
     border-radius: 16px;
@@ -387,7 +455,21 @@ body {
     color: var(--text-dark);
 }
 
-.nutri-row:last-child { border-bottom: none; }
+.nutri-row:last-child {
+    border-bottom: none;
+}
+
+/* ==========================================================================
+   6. UTILITÁRIOS E ANIMAÇÕES
+   ========================================================================== */
+.mt-20 {
+    margin-top: 20px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
 @keyframes slideUp {
     from { transform: translateY(20px); opacity: 0; }

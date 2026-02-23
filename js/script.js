@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 1. ESTADO GLOBAL (Simulação de Backend) ---
+    // ==========================================================================
+    // 1. ESTADO GLOBAL (Simulação de Backend)
+    // ==========================================================================
     const appState = {
         user: {
             name: "João",
@@ -13,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
     };
 
-    // Formatador de Moeda
+    // Formatador de Moeda (BRL)
     const currencyFormatter = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL'
@@ -26,30 +28,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${day} ${month}`;
     };
 
-    // --- 2. FUNÇÕES DE RENDERIZAÇÃO (UI) ---
+    // ==========================================================================
+    // 2. FUNÇÕES DE RENDERIZAÇÃO (UI)
+    // ==========================================================================
 
-    // Atualiza o saldo em todos os lugares da tela
+    // Atualiza o saldo na tela inicial
     function updateBalanceUI() {
-        const balanceElements = document.querySelectorAll('.balance-display'); // Certifique-se de adicionar essa classe no HTML
-        // Caso não tenha adicionado a classe, buscamos pelo contexto (fallback)
-        const displays = document.querySelectorAll('.balance-amount');
-        
-        displays.forEach(el => {
+        const balanceDisplays = document.querySelectorAll('.balance-display');
+        if (!balanceDisplays.length) return; // Proteção contra quebra
+
+        balanceDisplays.forEach(el => {
             el.textContent = currencyFormatter.format(appState.user.balance);
         });
     }
 
-    // Renderiza a lista de transações dinamicamente
+    // Renderiza a lista do extrato/carteira
     function renderTransactions() {
-        const listContainer = document.getElementById('transaction-list'); // Adicione este ID no HTML na div pai das transações
-        
-        // Se não achou o container (caso o usuário não tenha editado o HTML), tenta achar pela classe
-        const fallbackContainer = document.querySelector('.transactions-card');
-        const targetContainer = listContainer || fallbackContainer;
+        const listContainer = document.getElementById('transaction-list');
+        if (!listContainer) return; // Proteção contra quebra
 
-        if (!targetContainer) return;
-
-        targetContainer.innerHTML = ''; // Limpa a lista atual
+        listContainer.innerHTML = ''; // Limpa a lista atual
 
         // Ordena por data (mais recente primeiro)
         const sortedTransactions = [...appState.transactions].sort((a, b) => b.date - a.date);
@@ -58,38 +56,73 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = document.createElement('div');
             row.className = `transaction-item ${t.isIncome ? 'income' : 'expense'}`;
             
+            // Adiciona sinal de + ou - dependendo do tipo da transação
+            const prefix = t.isIncome ? '+' : '-';
+
             row.innerHTML = `
                 <div class="trans-info">${dateFormatter(t.date)} | ${t.type}</div>
-                <div class="trans-value">${currencyFormatter.format(t.value)}</div>
+                <div class="trans-value">${prefix} ${currencyFormatter.format(t.value)}</div>
             `;
-            targetContainer.appendChild(row);
+            listContainer.appendChild(row);
         });
     }
 
-    // Inicializa a UI com os dados do estado
+    // Inicializa a interface com os dados do Estado
     function initUI() {
         updateBalanceUI();
         renderTransactions();
     }
 
-    // --- 3. FUNCIONALIDADES INTERATIVAS ---
+    // ==========================================================================
+    // 3. SISTEMA DE NAVEGAÇÃO
+    // ==========================================================================
+    const navItems = document.querySelectorAll('.nav-item');
+    const views = document.querySelectorAll('.view');
+    const mainContent = document.getElementById('main-content');
 
-    // Lógica de Recarga
+    function navigateTo(targetId) {
+        // Atualiza estilo dos botões da nav
+        navItems.forEach(nav => {
+            nav.classList.toggle('active', nav.getAttribute('data-target') === targetId);
+        });
+
+        // Alterna a exibição das views (seções)
+        views.forEach(view => {
+            view.classList.toggle('active', view.id === targetId);
+        });
+
+        // Reseta o scroll ao mudar de aba
+        if (mainContent) mainContent.scrollTop = 0;
+    }
+
+    // Vincula clique aos itens do menu inferior
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const targetId = item.getAttribute('data-target');
+            if (targetId) navigateTo(targetId);
+        });
+    });
+
+    // Expondo globalmente caso precise navegar por botões internos (ex: após avaliar)
+    window.navigateTo = navigateTo;
+
+    // ==========================================================================
+    // 4. FUNCIONALIDADES INTERATIVAS
+    // ==========================================================================
+
+    // --- Lógica de Recarga ---
     function handleRecharge() {
         const input = window.prompt("Digite o valor da recarga (Ex: 20.00):");
-        
-        if (input === null) return; // Cancelou
+        if (input === null) return; // Usuário cancelou
 
-        // Troca vírgula por ponto para validar
-        const value = parseFloat(input.replace(',', '.'));
+        const value = parseFloat(input.replace(',', '.')); // Aceita vírgula ou ponto
 
         if (!isNaN(value) && value > 0) {
             // Atualiza Estado
             appState.user.balance += value;
-            
             appState.transactions.unshift({
                 id: Date.now(),
-                date: new Date(), // Data de hoje
+                date: new Date(),
                 type: 'Recarga - App',
                 value: value,
                 isIncome: true
@@ -105,118 +138,73 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Lógica de Avaliação
-    function handleRatingSubmit() {
-        // Verifica se há alguma estrela marcada como "solid" (active)
-        const hasRating = document.querySelector('.interactive-stars i.fa-solid');
-        const commentBox = document.querySelector('.comment-box');
+    const rechargeBtns = document.querySelectorAll('.btn-recharge');
+    rechargeBtns.forEach(btn => btn.addEventListener('click', handleRecharge));
 
-        if (hasRating) {
-            alert("Sucesso! Obrigado pelo seu feedback.");
+    // --- Lógica de Avaliação (Estrelas) ---
+    const stars = document.querySelectorAll('.interactive-stars i');
+    let currentRating = 0; // Estado local da avaliação
+
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            currentRating = parseInt(this.getAttribute('data-val'));
             
-            // Resetar formulário
-            document.querySelectorAll('.interactive-stars i').forEach(star => {
-                star.className = 'fa-regular fa-star'; // Reseta ícone
-                star.classList.remove('active'); // Remove classe de controle
+            // Pinta as estrelas dinamicamente
+            stars.forEach(s => {
+                const sVal = parseInt(s.getAttribute('data-val'));
+                if (sVal <= currentRating) {
+                    s.className = 'fa-solid fa-star active';
+                } else {
+                    s.className = 'fa-regular fa-star';
+                }
             });
-            if(commentBox) commentBox.value = "";
-            
-            //Voltar para Home
-            window.navigateTo('view-home');
-        } else {
-            alert("Por favor, selecione pelo menos uma estrela em algum critério para avaliar.");
-        }
+        });
+    });
+
+    // --- Envio da Avaliação ---
+    const submitRatingBtn = document.getElementById('btn-submit-rating');
+    const commentBox = document.querySelector('.comment-box');
+
+    if (submitRatingBtn) {
+        submitRatingBtn.addEventListener('click', () => {
+            if (currentRating > 0) {
+                alert("Avaliação enviada com sucesso! Obrigado pelo seu feedback.");
+                
+                // Reseta o formulário
+                currentRating = 0;
+                stars.forEach(s => s.className = 'fa-regular fa-star');
+                if (commentBox) commentBox.value = "";
+                
+                // Retorna para a Home
+                navigateTo('view-home');
+            } else {
+                alert("Por favor, selecione uma nota clicando nas estrelas antes de enviar.");
+            }
+        });
     }
 
-    // Lógica do Modal Nutricional
+    // --- Lógica do Modal Nutricional ---
     const nutritionModal = document.getElementById('nutrition-modal');
+    const btnNutrition = document.getElementById('btn-nutrition');
+    const closeBtn = document.querySelector('.close-modal');
     
     function toggleModal(show) {
         if (!nutritionModal) return;
-        if (show) {
-            nutritionModal.classList.add('open');
-        } else {
-            nutritionModal.classList.remove('open');
-        }
+        nutritionModal.classList.toggle('open', show);
     }
 
-
-    // --- 4. EVENT LISTENERS (Vínculos) ---
-
-    // Botões de Recarga (seleciona todos pela classe nova ou fallback)
-    const rechargeBtns = document.querySelectorAll('.btn-recharge, .balance-card .btn-primary');
-    rechargeBtns.forEach(btn => {
-        btn.onclick = handleRecharge; // Vincula função diretamente
-    });
-
-    // Botão de Avaliação
-    const submitRatingBtn = document.getElementById('btn-submit-rating') || document.querySelector('#view-rating .btn-primary');
-    if (submitRatingBtn) {
-        submitRatingBtn.addEventListener('click', handleRatingSubmit);
-    }
-
-    // Botão Tabela Nutricional
-    const nutriBtn = document.getElementById('btn-nutrition') || document.querySelector('#view-menu .btn-outline');
-    if (nutriBtn) {
-        nutriBtn.addEventListener('click', () => toggleModal(true));
-    }
-
-    // Fechar Modal (X)
-    const closeBtn = document.querySelector('.close-modal');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => toggleModal(false));
-    }
-    // Fechar ao clicar fora
+    if (btnNutrition) btnNutrition.addEventListener('click', () => toggleModal(true));
+    if (closeBtn) closeBtn.addEventListener('click', () => toggleModal(false));
+    
+    // Fechar ao clicar fora do modal
     if (nutritionModal) {
         nutritionModal.addEventListener('click', (e) => {
             if (e.target === nutritionModal) toggleModal(false);
         });
     }
 
-
-    // --- 5. SISTEMA DE NAVEGAÇÃO E ESTRELAS ---
-    
-    // Navegação (Tabs)
-    const navItems = document.querySelectorAll('.nav-item');
-    const views = document.querySelectorAll('.view');
-
-    navItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const targetId = item.getAttribute('data-target');
-            navItems.forEach(nav => nav.classList.remove('active'));
-            item.classList.add('active');
-            views.forEach(view => {
-                view.classList.remove('active');
-                if(view.id === targetId) view.classList.add('active');
-            });
-            document.getElementById('main-content').scrollTop = 0;
-        });
-    });
-
-    window.navigateTo = (viewId) => {
-        const targetNav = document.querySelector(`.nav-item[data-target="${viewId}"]`);
-        if(targetNav) targetNav.click();
-    };
-
-    // Estrelas Interativas
-    const criteriaGroups = document.querySelectorAll('.rating-criteria');
-    criteriaGroups.forEach(group => {
-        const stars = group.querySelectorAll('.interactive-stars i');
-        stars.forEach(star => {
-            star.addEventListener('click', function() {
-                const value = parseInt(this.getAttribute('data-val'));
-                stars.forEach(s => {
-                    const sVal = parseInt(s.getAttribute('data-val'));
-                    if (sVal <= value) {
-                        s.className = 'fa-solid fa-star active';
-                    } else {
-                        s.className = 'fa-regular fa-star';
-                    }
-                });
-            });
-        });
-    });
-
-    // INICIALIZAÇÃO
+    // ==========================================================================
+    // 5. BOOTSTRAP (Start)
+    // ==========================================================================
     initUI();
 });
