@@ -274,6 +274,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
     checkAuth(); initUI();
 
+    // --- Lógica de "Esqueci minha Senha" ---
+    const forgotModal       = document.getElementById('forgot-password-modal');
+    const forgotStep1       = document.getElementById('forgot-step-1');
+    const forgotStep2       = document.getElementById('forgot-step-2');
+    const forgotEmailInput  = document.getElementById('forgot-email-input');
+    const forgotError       = document.getElementById('forgot-error');
+    const forgotEmailSent   = document.getElementById('forgot-email-sent');
+    const VALID_RECOVERY_EMAIL = 'joao@ufcat.edu.br';
+
+    document.getElementById('btn-forgot-password')?.addEventListener('click', () => {
+        // Reseta o modal para o passo 1
+        forgotStep1.classList.remove('d-none');
+        forgotStep2.classList.add('d-none');
+        if (forgotEmailInput) forgotEmailInput.value = '';
+        if (forgotError) forgotError.classList.add('d-none');
+        forgotModal.classList.add('open');
+    });
+
+    document.getElementById('close-forgot')?.addEventListener('click', () => {
+        forgotModal.classList.remove('open');
+    });
+
+    document.getElementById('btn-send-reset')?.addEventListener('click', function() {
+        const email = forgotEmailInput?.value.trim();
+        if (!email) return;
+
+        if (email !== VALID_RECOVERY_EMAIL) {
+            forgotError?.classList.remove('d-none');
+            return;
+        }
+
+        // Simula envio: mostra loading no botão
+        this.classList.add('is-loading');
+        forgotError?.classList.add('d-none');
+
+        setTimeout(() => {
+            this.classList.remove('is-loading');
+            if (forgotEmailSent) forgotEmailSent.textContent = email;
+            forgotStep1.classList.add('d-none');
+            forgotStep2.classList.remove('d-none');
+        }, 1500);
+    });
+
+    document.getElementById('btn-close-forgot-success')?.addEventListener('click', () => {
+        forgotModal.classList.remove('open');
+    });
+
     renderTransactionsSkeleton();
 
 setTimeout(() => {
@@ -281,6 +328,18 @@ setTimeout(() => {
         document.querySelectorAll('.skeleton').forEach(el => {
             el.classList.remove('skeleton');
         });
+
+        // Remove skeleton dos textos inline (nome e cardápio)
+        const nameEl = document.getElementById('home-user-name');
+        if (nameEl) {
+            nameEl.classList.remove('skeleton-text', 'skel-name');
+            nameEl.textContent = appState.user.name;
+        }
+        const menuEl = document.getElementById('home-menu-text');
+        if (menuEl) {
+            menuEl.classList.remove('skeleton-text', 'skel-menu');
+            menuEl.textContent = 'Frango Grelhado, Purê e Salada';
+        }
         
         // Injeta os dados "reais" após o carregamento
         updateBalanceUI();

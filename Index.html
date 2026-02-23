@@ -24,6 +24,7 @@
         <p id="login-error" class="error-text d-none">Credenciais inválidas.</p>
         
         <button id="btn-login" class="btn-text">Entrar</button>
+        <button id="btn-forgot-password" class="btn-forgot">Esqueci minha senha</button>
     </section>
 
     <header id="app-header" class="app-header d-none">
@@ -38,7 +39,7 @@
 
         <section id="view-home" class="view active">
             <div class="card">
-                <h3 class="greeting">Olá, João</h3>
+                <h3 class="greeting">Olá, <span id="home-user-name" class="skeleton-text skel-name">João</span></h3>
     
                 <div class="balance-container mt-15">
                     <span class="balance-label">Saldo disponível</span>
@@ -56,7 +57,7 @@
                     
                     <div class="highlight-content">
                         <span class="highlight-title">Almoço</span>
-                        <span class="highlight-desc skeleton">Arroz, feijão e frango</span>
+                        <span class="highlight-desc"><span id="home-menu-text" class="skeleton-text skel-menu">Arroz, feijão e frango</span></span>
                     </div>
                 </div>
 
@@ -179,6 +180,10 @@
     </main>
 
     <nav id="bottom-nav" class="bottom-nav d-none">
+        <div class="sidebar-logo">
+            <img src="assets/img/OIP.webp" alt="Logo UFCAT" class="sidebar-logo-img">
+            <span class="sidebar-logo-title">RU Digital</span>
+        </div>
         <div class="nav-item active" data-target="view-home">
             <div class="nav-icon-box"><i class="fa-solid fa-house"></i></div>
             <span>Início</span>
@@ -198,6 +203,13 @@
         <div class="nav-item" data-target="view-profile">
             <div class="nav-icon-box"><i class="fa-solid fa-user"></i></div>
             <span>Perfil</span>
+        </div>
+        <div class="sidebar-footer">
+            <i class="fa-solid fa-circle-user sidebar-user-icon"></i>
+            <div class="sidebar-user-info">
+                <span class="sidebar-user-name">João Ricardo</span>
+                <span class="sidebar-user-role">Estudante · CC</span>
+            </div>
         </div>
     </nav>
 
@@ -245,6 +257,29 @@
                     <p>Não se esqueça de deixar sua opinião sobre a refeição de hoje.</p>
                     <small>Ontem</small>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="forgot-password-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Recuperar Acesso</h3>
+                <i class="fa-solid fa-xmark close-modal" id="close-forgot"></i>
+            </div>
+            <div id="forgot-step-1">
+                <p class="forgot-desc">Informe seu e-mail institucional. Enviaremos um link de redefinição de senha.</p>
+                <input type="email" id="forgot-email-input" class="form-input mt-10" placeholder="joao@ufcat.edu.br">
+                <p id="forgot-error" class="error-text-dark d-none">E-mail não encontrado.</p>
+                <button id="btn-send-reset" class="btn btn-primary mt-20">Enviar link de redefinição</button>
+            </div>
+            <div id="forgot-step-2" class="d-none">
+                <div class="forgot-success">
+                    <i class="fa-solid fa-circle-check forgot-success-icon"></i>
+                    <h4 class="forgot-success-title">E-mail enviado!</h4>
+                    <p class="forgot-desc">Verifique a caixa de entrada de <strong id="forgot-email-sent"></strong> e siga as instruções para redefinir sua senha.</p>
+                </div>
+                <button id="btn-close-forgot-success" class="btn btn-primary mt-20">Entendido</button>
             </div>
         </div>
     </div>

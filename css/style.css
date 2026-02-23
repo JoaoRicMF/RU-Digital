@@ -140,8 +140,8 @@ body {
 }
 
 .btn:active { 
-    transform: scale(0.98); 
-    opacity: 0.9; 
+    transform: scale(0.97); 
+    opacity: 0.88; 
 }
 
 .btn-primary { 
@@ -150,16 +150,36 @@ body {
     box-shadow: 0 4px 12px rgba(46, 125, 117, 0.35); 
 }
 
+.btn-primary:hover {
+    background-color: #256760;
+    box-shadow: 0 6px 18px rgba(46, 125, 117, 0.45);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: scale(0.97) translateY(0);
+}
+
 .btn-outline { 
     background-color: transparent; 
     border: 2px solid var(--accent-color); 
     color: var(--accent-color); 
 }
 
+.btn-outline:hover {
+    background-color: rgba(240, 110, 62, 0.07);
+    transform: translateY(-1px);
+}
+
 .btn-danger-outline { 
     background-color: transparent; 
     border: 2px solid #E53935; 
     color: #E53935; 
+}
+
+.btn-danger-outline:hover {
+    background-color: rgba(229, 57, 53, 0.07);
+    transform: translateY(-1px);
 }
 
 .btn-text-link {
@@ -180,6 +200,19 @@ body {
 
 .btn-text-link:active {
     opacity: 0.7;
+}
+
+.btn-text-link:hover {
+    opacity: 0.75;
+    text-decoration: underline;
+}
+
+/* Garante que :active funcione corretamente no mobile (touch) */
+@media (hover: none) {
+    .btn:hover { transform: none; box-shadow: none; background-color: unset; }
+    .btn-primary:hover { background-color: var(--primary-color); box-shadow: 0 4px 12px rgba(46, 125, 117, 0.35); }
+    .btn-outline:hover { background-color: transparent; }
+    .btn-danger-outline:hover { background-color: transparent; }
 }
 
 /* ==========================================================================
@@ -313,6 +346,65 @@ body {
 .mb-24 { margin-bottom: 24px; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+/* Forgot password link no login */
+.btn-forgot {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 14px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s;
+}
+.btn-forgot:hover { color: white; }
+
+/* Modal recuperação de senha */
+.forgot-desc {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+.error-text-dark {
+    color: #E53935;
+    font-size: 0.85rem;
+    margin-top: 8px;
+}
+.forgot-success {
+    text-align: center;
+    padding: 12px 0;
+}
+.forgot-success-icon {
+    font-size: 3rem;
+    color: var(--success-color);
+    margin-bottom: 12px;
+}
+.forgot-success-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+}
+
+
+.form-input {
+    background: #f2f4f7;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 13px 15px;
+    font-size: 1rem;
+    width: 100%;
+    color: var(--text-dark);
+    transition: border-color 0.2s;
+}
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
 /* Modais */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
 .modal-overlay.open { display: flex; }
@@ -362,7 +454,24 @@ body {
    8. MICRO-INTERAÇÕES (PRO LEVEL)
    ========================================================================== */
 
-/* 1. Skeleton Loading (Carregamento Falso) */
+/* Skeleton para textos inline (saudação, cardápio) */
+.skeleton-text {
+    background: linear-gradient(90deg, #d2d2d2 25%, #e8e8e8 50%, #d2d2d2 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 6px;
+    color: transparent !important;
+    display: inline-block;
+    min-width: 120px;
+    height: 1em;
+    vertical-align: middle;
+}
+
+.skeleton-text.skel-name   { min-width: 90px; }
+.skeleton-text.skel-menu   { min-width: 180px; }
+.skeleton-text.skel-date   { min-width: 140px; }
+
+
 .skeleton {
     background: linear-gradient(90deg, #d2d2d2 25%, #e8e8e8 50%, #d2d2d2 75%);
     background-size: 200% 100%;
@@ -455,59 +564,331 @@ body {
 .skel-large { width: 55%; }
 .skel-small { width: 25%; }
 
+/* Sidebar-only elements hidden by default (mobile) */
+.sidebar-logo,
+.sidebar-footer {
+    display: none;
+}
+
 /* ==========================================================================
-   7. RESPONSIVIDADE (DESKTOP & TABLET)
+   7. RESPONSIVIDADE (TABLET - 768px a 1023px)
    ========================================================================== */
-@media (min-width: 768px) {
-    /* 1. Expande o container principal e centraliza na tela */
+@media (min-width: 768px) and (max-width: 1023px) {
+    /* Expande o container e centraliza */
     .app-container {
-        max-width: 900px;
-        margin: 40px auto; /* Descola o app das bordas do monitor */
+        max-width: 720px;
+        margin: 20px auto;
         border-radius: var(--border-radius);
-        overflow: hidden; /* Garante que o fundo não vaze das bordas arredondadas */
+        overflow: hidden;
     }
 
-    /* 2. Transforma a navegação inferior em um menu superior elegante */
+    /* Transforma a nav inferior em menu superior */
     .bottom-nav {
-        position: relative; /* Tira do fundo da tela */
+        position: relative;
         height: auto;
         border-top: none;
         border-bottom: 1px solid #eee;
-        padding: 10px 0;
-        justify-content: center; /* Centraliza os itens no desktop */
-        gap: 30px;
+        padding: 8px 0;
+        justify-content: center;
+        gap: 20px;
     }
 
     .nav-item {
         width: auto;
-        flex-direction: row; /* Coloca o ícone e o texto lado a lado */
-        padding: 10px 20px;
+        flex-direction: row;
+        padding: 8px 16px;
+    }
+
+    .nav-icon-box {
+        margin-bottom: 0;
+        margin-right: 6px;
+        padding: 4px 10px;
+    }
+
+    #main-content {
+        padding-bottom: 24px;
+    }
+
+    /* Grid de 2 colunas na Home */
+    #view-home.active {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        align-items: start;
+    }
+    #view-home .card { margin-bottom: 0; }
+    #view-home .card:first-child { grid-column: 1 / -1; }
+}
+
+/* ==========================================================================
+   7b. RESPONSIVIDADE (DESKTOP - 1024px+) — Sidebar Layout
+   ========================================================================== */
+@media (min-width: 1024px) {
+
+    body {
+        background-color: #dce0e6;
+        align-items: flex-start;
+    }
+
+    /* App ocupa quase toda a tela em widescreen */
+    .app-container {
+        max-width: 1200px;
+        width: calc(100% - 48px);
+        margin: 24px auto;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+        flex-direction: row; /* Sidebar + conteúdo lado a lado */
+        min-height: calc(100vh - 48px);
+        height: calc(100vh - 48px);
+    }
+
+    /* Show sidebar decorative elements on desktop */
+    .sidebar-logo {
+        display: flex;
+    }
+
+    .sidebar-footer {
+        display: flex;
+    }
+
+    /* ---- SIDEBAR ---- */
+    .bottom-nav {
+        position: relative;
+        width: 240px;
+        min-width: 240px;
+        height: 100%;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        border-top: none;
+        border-right: 1px solid #eee;
+        padding: 0;
+        gap: 0;
+        background: var(--card-bg);
+        box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+        overflow-y: auto;
+    }
+
+    /* Logo no topo da sidebar */
+    .sidebar-logo {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 20px 18px;
+        border-bottom: 1px solid #f0f0f0;
+        background: linear-gradient(160deg, var(--primary-color) 0%, #3a9e95 100%);
+        flex-shrink: 0;
+    }
+
+    .sidebar-logo-img {
+        width: 56px;
+        height: 56px;
+        object-fit: contain;
+        border-radius: 14px;
+        background: white;
+        padding: 6px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+        margin-bottom: 10px;
+    }
+
+    .sidebar-logo-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: white;
+        letter-spacing: 0.5px;
+    }
+
+    /* Footer da sidebar com info do usuário */
+    .sidebar-footer {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 20px;
+        border-top: 1px solid #f0f0f0;
+        background: #fafafa;
+    }
+
+    .sidebar-user-icon {
+        font-size: 2.2rem;
+        color: var(--primary-color);
+        flex-shrink: 0;
+    }
+
+    .sidebar-user-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar-user-name {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .sidebar-user-role {
+        font-size: 0.75rem;
+        color: var(--text-light);
+    }
+
+    .nav-item {
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 14px 20px;
+        border-radius: 0;
+        font-size: 0.95rem;
+        gap: 0;
+        border-left: 3px solid transparent;
+        transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    }
+
+    .nav-item:hover {
+        background-color: rgba(46, 125, 117, 0.06);
+        color: var(--primary-color);
+    }
+
+    .nav-icon-box {
+        width: 36px;
+        min-width: 36px;
+        padding: 6px 0;
+        margin-bottom: 0;
+        margin-right: 12px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        transition: background-color 0.2s;
     }
 
     .nav-item i {
-        margin-bottom: 0;
-        margin-right: 8px; /* Espaço entre o ícone e o texto */
+        font-size: 1.15rem;
+        margin: 0;
     }
 
-    /* 3. Ajusta o espaçamento do conteúdo principal */
+    .nav-item.active {
+        border-left-color: var(--primary-color);
+        background-color: rgba(46, 125, 117, 0.08);
+    }
+
+    .nav-item.active .nav-icon-box {
+        background-color: rgba(46, 125, 117, 0.15);
+    }
+
+    /* ---- HEADER — esconde no desktop (sidebar substitui) ---- */
+    .app-header {
+        display: none !important;
+    }
+
+    /* ---- ÁREA DE CONTEÚDO ---- */
     #main-content {
-        padding-bottom: 30px; /* Remove o espaço extra deixado para a nav mobile */
+        flex: 1;
+        padding: 28px 32px;
+        padding-bottom: 28px;
+        overflow-y: auto;
+        height: 100%;
     }
 
-    /* 4. Aproveita a largura extra criando um Grid (Colunas) na Home */
+    /* Grid de 2 colunas na Home */
     #view-home.active {
         display: grid;
-        grid-template-columns: 1fr 1fr; /* Divide em duas colunas de tamanhos iguais */
+        grid-template-columns: 1fr 1fr;
         gap: 20px;
         align-items: start;
     }
+    #view-home .card { margin-bottom: 0; }
+    /* Card saldo: linha inteira no topo */
+    #view-home .card:nth-child(1) { grid-column: 1 / -1; }
+    /* Cards Cardápio e Avaliação: lado a lado */
+    #view-home .card:nth-child(2) { grid-column: 1 / 2; }
+    #view-home .card:nth-child(3) { grid-column: 2 / 3; }
 
-    #view-home .card {
-        margin-bottom: 0; /* O 'gap' do grid já faz o espaçamento */
+    /* Cardápio: 1 coluna (conteúdo único) */
+    #view-menu.active {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        align-items: start;
+        max-width: 640px;
+    }
+    #view-menu .card { margin-bottom: 0; }
+
+    /* Avaliação em 2 colunas: header topo inteiro, critérios e comentário lado a lado */
+    #view-rating.active {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+    #view-rating .card { margin-bottom: 0; }
+    /* Card saudação ocupa linha inteira */
+    #view-rating .card:nth-child(1) { grid-column: 1 / -1; }
+    /* Critérios e comentários lado a lado */
+    #view-rating .card:nth-child(2) { grid-column: 1 / 2; }
+    #view-rating .card:nth-child(3) { grid-column: 2 / 3; }
+
+    /* Wallet em 2 colunas */
+    #view-wallet.active {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 20px;
+        align-items: start;
+    }
+    #view-wallet .card { margin-bottom: 0; }
+
+    /* Perfil centralizado */
+    #view-profile.active {
+        max-width: 480px;
+        margin: 0 auto;
     }
 
-    /* Faz o card de Saldo ocupar as duas colunas inteiras no topo */
-    #view-home .card:first-child {
-        grid-column: 1 / -1;
+    /* ---- GLASSMORPHISM NOS MODAIS ---- */
+    .modal-overlay {
+        background: rgba(15, 40, 38, 0.45);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        transition: background 0.3s ease;
+    }
+
+    .modal-content {
+        max-width: 420px;
+        border-radius: 24px;
+        padding: 28px;
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(24px) saturate(1.6);
+        -webkit-backdrop-filter: blur(24px) saturate(1.6);
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        box-shadow:
+            0 8px 32px rgba(0, 0, 0, 0.18),
+            0 1px 0 rgba(255,255,255,0.9) inset;
+        animation: modalPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes modalPop {
+        from { opacity: 0; transform: scale(0.93) translateY(12px); }
+        to   { opacity: 1; transform: scale(1)    translateY(0); }
+    }
+
+    .modal-header {
+        border-bottom-color: rgba(0,0,0,0.08);
+    }
+
+    .form-input {
+        background: rgba(240, 244, 247, 0.8);
+        border: 1px solid rgba(46, 125, 117, 0.2);
+        border-radius: 10px;
+        padding: 13px 15px;
+        font-size: 1rem;
+        width: 100%;
+        color: var(--text-dark);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    /* Login ocupa tela cheia mesmo no desktop */
+    #view-login.login-container {
+        border-radius: 0;
     }
 }
