@@ -357,3 +357,157 @@ body {
     display: block !important; 
     animation: fadeIn 0.3s ease; 
 }
+
+/* ==========================================================================
+   8. MICRO-INTERAÇÕES (PRO LEVEL)
+   ========================================================================== */
+
+/* 1. Skeleton Loading (Carregamento Falso) */
+.skeleton {
+    background: linear-gradient(90deg, #d2d2d2 25%, #e8e8e8 50%, #d2d2d2 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    color: transparent !important; /* Esconde o texto real enquanto carrega */
+    border-radius: 8px;
+    display: inline-block;
+    min-width: 100px;
+}
+.skeleton * { visibility: hidden; } /* Esconde filhos se houver */
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* 2. Pulso no Botão de Recarga (Chamar Atenção) */
+@keyframes pulseGlow {
+    0% { box-shadow: 0 4px 12px rgba(46, 125, 117, 0.35); transform: scale(1); }
+    50% { box-shadow: 0 0 0 6px rgba(46, 125, 117, 0.2); transform: scale(1.01); } /* Cria uma "aura" ao redor */
+    100% { box-shadow: 0 4px 12px rgba(46, 125, 117, 0.35); transform: scale(1); }
+}
+
+.btn-recharge {
+    animation: pulseGlow 2.5s infinite;
+}
+.btn-recharge:active {
+    animation: none; /* Para a animação na hora que o usuário toca */
+}
+
+/* 3. Estrela com efeito de "Mola" (Pop) */
+@keyframes starPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); color: #FFC107; } /* Fica maior e bem amarela por um instante */
+    100% { transform: scale(1); }
+}
+
+.star-animating {
+    animation: starPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ==========================================================================
+   9. LOADING STATES (SPINNERS E SKELETONS)
+   ========================================================================== */
+
+/* Spinner no botão (Desativa o clique e esconde o texto) */
+.btn.is-loading {
+    position: relative;
+    color: transparent !important; /* Esconde o texto "Confirmar Recarga" */
+    pointer-events: none; /* Bloqueia cliques duplos! */
+    opacity: 0.8;
+}
+
+@keyframes spin-local {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.btn.is-loading::after {
+    content: "\f110"; /* Código do ícone fa-spinner do FontAwesome */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    color: white;
+    font-size: 1.2rem;
+    animation: spin-local 1s infinite linear;
+}
+
+/* Skeleton específico para as linhas da lista de Extrato */
+.skeleton-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #c9c9c9;
+}
+.skeleton-row:last-child {
+    border-bottom: none;
+}
+
+.skel-box {
+    height: 16px;
+    background: linear-gradient(90deg, #d2d2d2 25%, #e8e8e8 50%, #d2d2d2 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+}
+.skel-large { width: 55%; }
+.skel-small { width: 25%; }
+
+/* ==========================================================================
+   7. RESPONSIVIDADE (DESKTOP & TABLET)
+   ========================================================================== */
+@media (min-width: 768px) {
+    /* 1. Expande o container principal e centraliza na tela */
+    .app-container {
+        max-width: 900px;
+        margin: 40px auto; /* Descola o app das bordas do monitor */
+        border-radius: var(--border-radius);
+        overflow: hidden; /* Garante que o fundo não vaze das bordas arredondadas */
+    }
+
+    /* 2. Transforma a navegação inferior em um menu superior elegante */
+    .bottom-nav {
+        position: relative; /* Tira do fundo da tela */
+        height: auto;
+        border-top: none;
+        border-bottom: 1px solid #eee;
+        padding: 10px 0;
+        justify-content: center; /* Centraliza os itens no desktop */
+        gap: 30px;
+    }
+
+    .nav-item {
+        width: auto;
+        flex-direction: row; /* Coloca o ícone e o texto lado a lado */
+        padding: 10px 20px;
+    }
+
+    .nav-item i {
+        margin-bottom: 0;
+        margin-right: 8px; /* Espaço entre o ícone e o texto */
+    }
+
+    /* 3. Ajusta o espaçamento do conteúdo principal */
+    #main-content {
+        padding-bottom: 30px; /* Remove o espaço extra deixado para a nav mobile */
+    }
+
+    /* 4. Aproveita a largura extra criando um Grid (Colunas) na Home */
+    #view-home.active {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Divide em duas colunas de tamanhos iguais */
+        gap: 20px;
+        align-items: start;
+    }
+
+    #view-home .card {
+        margin-bottom: 0; /* O 'gap' do grid já faz o espaçamento */
+    }
+
+    /* Faz o card de Saldo ocupar as duas colunas inteiras no topo */
+    #view-home .card:first-child {
+        grid-column: 1 / -1;
+    }
+}

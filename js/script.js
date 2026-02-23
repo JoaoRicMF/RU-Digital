@@ -21,6 +21,17 @@ document.addEventListener('DOMContentLoaded', () => {
             el.textContent = currencyFormatter.format(appState.user.balance);
         });
     }
+    function renderTransactionsSkeleton() {
+        const listContainer = document.getElementById('transaction-list');
+        if (!listContainer) return;
+        
+        listContainer.innerHTML = `
+            <div class="skeleton-row"><div class="skel-box skel-large"></div><div class="skel-box skel-small"></div></div>
+            <div class="skeleton-row"><div class="skel-box skel-large"></div><div class="skel-box skel-small"></div></div>
+            <div class="skeleton-row"><div class="skel-box skel-large"></div><div class="skel-box skel-small"></div></div>
+            <div class="skeleton-row"><div class="skel-box skel-large"></div><div class="skel-box skel-small"></div></div>
+        `;
+    }
 
     function renderTransactions() {
         const listContainer = document.getElementById('transaction-list');
@@ -88,33 +99,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 3. Processar a Recarga ao clicar em "Confirmar"
-    document.getElementById('btn-confirm-recharge')?.addEventListener('click', () => {
-        const inputValue = rechargeInput.value;
-        if (!inputValue) return; // Se estiver vazio, não faz nada
+    document.getElementById('btn-confirm-recharge')?.addEventListener('click', function() {
+        if (!rechargeInput || !rechargeInput.value) return;
+        const value = parseFloat(rechargeInput.value.replace(',', '.')); 
         
-        // Aceita vírgula ou ponto
-        const value = parseFloat(inputValue.replace(',', '.')); 
-
         if (!isNaN(value) && value > 0) {
-            // Atualiza Estado
-            appState.user.balance += value;
-            appState.transactions.unshift({
-                id: Date.now(), 
-                date: 'HOJE', 
-                type: 'Recarga - App', 
-                value: value, 
-                isIncome: true
-            });
+            const btn = this; // O botão que foi clicado
             
-            // Atualiza UI
-            updateBalanceUI(); 
-            renderTransactions();
+            // 1. Ativa o estado de "Loading" (bloqueia e mostra o spinner)
+            btn.classList.add('is-loading');
             
-            // Fecha modal e avisa
-            rechargeModal.classList.remove('open');
-            alert(`Recarga de ${currencyFormatter.format(value)} realizada com sucesso!`);
+            // 2. Simula o tempo de resposta da rede (ex: 1.5 segundos)
+            setTimeout(() => {
+                // Remove o loading do botão
+                btn.classList.remove('is-loading');
+                
+                // Atualiza o Estado Global
+                appState.user.balance += value;
+                appState.transactions.unshift({
+                    id: Date.now(), date: 'HOJE', type: 'Recarga - App', value: value, isIncome: true
+                });
+                
+                // Atualiza Saldo na UI e fecha o modal
+                updateBalanceUI(); 
+                rechargeModal.classList.remove('open');
+                
+                // Dispara o Skeleton no Extrato antes de mostrar o Extrato real
+                renderTransactionsSkeleton();
+                setTimeout(() => {
+                    renderTransactions(); // Mostra as transações reais 800ms depois
+                }, 800); 
+                
+                // Alerta de Sucesso (um pequeno delay para evitar travar a UI)
+                setTimeout(() => {
+                    alert(`Recarga de ${currencyFormatter.format(value)} realizada com sucesso!`);
+                }, 100);
+                
+            }, 1500); // Fim da simulação de 1.5s
+            
         } else {
-            alert("Valor inválido. Por favor, insira um número maior que zero.");
+            alert("Valor inválido.");
         }
     });
 
@@ -158,7 +182,48 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. AUTENTICAÇÃO
     const VALID_USER = { email: "joao@ufcat.edu.br", password: "123456" };
     const loginView = document.getElementById('view-login'), appHeader = document.getElementById('app-header'), bottomNav = document.getElementById('bottom-nav');
-    
+    const btnSubmitRating = document.getElementById('btn-submit-rating');
+
+    if (btnSubmitRating) {
+        btnSubmitRating.addEventListener('click', () => {
+            const allGroups = document.querySelectorAll('.interactive-stars');
+            const commentBox = document.querySelector('.comment-box');
+            let answeredCount = 0;
+            
+            // Verifica quantas categorias receberam uma nota
+            allGroups.forEach(g => {
+                if (g.getAttribute('data-selected')) {
+                    answeredCount++;
+                }
+            });
+
+            // Validação: Exige que pelo menos uma categoria tenha sido avaliada
+            if (answeredCount > 0) {
+                // Aqui no futuro enviaria os dados (nota e comentário) para a API do backend
+                const commentText = commentBox ? commentBox.value.trim() : "";
+                console.log("Feedback pronto para envio:", { notasDadas: answeredCount, comentario: commentText });
+
+                alert("Avaliação enviada com sucesso! O RU agradece o seu feedback.");
+                
+                // Reseta as estrelas para o estado inicial
+                allGroups.forEach(g => {
+                    g.removeAttribute('data-selected');
+                    g.querySelectorAll('i').forEach(s => {
+                        s.className = 'fa-regular fa-star';
+                    });
+                });
+                
+                // Limpa a caixa de texto
+                if (commentBox) commentBox.value = "";
+                
+                // Navega de volta para o Início
+                window.navigateTo('view-home');
+            } else {
+                alert("Por favor, avalie pelo menos um critério clicando nas estrelas antes de enviar.");
+            }
+        });
+    }
+
     function checkAuth() {
         if (localStorage.getItem('ru_digital_logged_in') === 'true') {
             loginView.classList.add('d-none'); appHeader.classList.remove('d-none'); mainContent.classList.remove('d-none'); bottomNav.classList.remove('d-none'); window.navigateTo('view-home');
@@ -181,5 +246,44 @@ document.addEventListener('DOMContentLoaded', () => {
         checkAuth();
     });
 
+    document.querySelectorAll('.interactive-stars').forEach(group => {
+        const stars = group.querySelectorAll('i');
+        
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const val = parseInt(this.getAttribute('data-val'));
+                
+                stars.forEach(s => {
+                    const sVal = parseInt(s.getAttribute('data-val'));
+                    if (sVal <= val) {
+                        s.className = 'fa-solid fa-star active';
+                        
+                        // Efeito tátil "Pop" (Micro-interação)
+                        s.classList.add('star-animating');
+                        setTimeout(() => s.classList.remove('star-animating'), 300);
+                    } else {
+                        s.className = 'fa-regular fa-star';
+                    }
+                });
+                
+                // Guarda a nota escolhida num atributo data-selected do contentor pai
+                group.setAttribute('data-selected', val);
+            });
+        });
+    });
+
     checkAuth(); initUI();
+
+    renderTransactionsSkeleton();
+
+setTimeout(() => {
+        // Remove a classe skeleton dos textos (Saldo e Cardápio)
+        document.querySelectorAll('.skeleton').forEach(el => {
+            el.classList.remove('skeleton');
+        });
+        
+        // Injeta os dados "reais" após o carregamento
+        updateBalanceUI();
+        renderTransactions(); 
+    }, 1200);
 });
