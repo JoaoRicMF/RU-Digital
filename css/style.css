@@ -475,3 +475,53 @@ body {
     from { transform: translateY(20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
+
+/* ==========================================================================
+   7. AUTENTICAÇÃO E UTILITÁRIOS DE ESTADO
+   ========================================================================== */
+
+/* Tela de Login */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--primary-color);
+    padding: 20px;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 350px;
+    padding: 30px 20px;
+}
+
+/* Inputs de Formulário */
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    color: var(--text-dark);
+}
+
+.form-input:focus {
+    border-color: var(--primary-color);
+}
+
+/* Textos de Erro */
+.error-text {
+    color: #E53935;
+    font-size: 0.9rem;
+    text-align: center;
+    display: block;
+}
+
+/* Utilitário para ocultar elementos globalmente */
+.d-none {
+    display: none !important;
+}

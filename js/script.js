@@ -204,7 +204,80 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================================================
-    // 5. BOOTSTRAP (Start)
+    // 5. AUTENTICAÇÃO (Login / Logout / LocalStorage)
+    // ==========================================================================
+    
+    // Credenciais simuladas (Mock)
+    const VALID_USER = { email: "joao@ufcat.edu.br", password: "123456" };
+
+    // Elementos da UI de Autenticação
+    const loginView = document.getElementById('view-login');
+    const appHeader = document.getElementById('app-header');
+    const bottomNav = document.getElementById('bottom-nav');
+    
+    const inputEmail = document.getElementById('login-email');
+    const inputPassword = document.getElementById('login-password');
+    const loginError = document.getElementById('login-error');
+    const btnLogin = document.getElementById('btn-login');
+    const btnLogout = document.getElementById('btn-logout');
+
+    // Verifica se já existe uma sessão ativa
+    function checkAuth() {
+        const isLoggedIn = localStorage.getItem('ru_digital_logged_in') === 'true';
+        if (isLoggedIn) {
+            showApp();
+        } else {
+            showLogin();
+        }
+    }
+
+    function showApp() {
+        loginView.classList.add('d-none');
+        appHeader.classList.remove('d-none');
+        mainContent.classList.remove('d-none');
+        bottomNav.classList.remove('d-none');
+        navigateTo('view-home'); // Força a renderização inicial na tela Home
+    }
+
+    function showLogin() {
+        loginView.classList.remove('d-none');
+        appHeader.classList.add('d-none');
+        mainContent.classList.add('d-none');
+        bottomNav.classList.add('d-none');
+        loginError.classList.add('d-none'); // Reseta o erro
+    }
+
+    // Ação de Login
+    if (btnLogin) {
+        btnLogin.addEventListener('click', () => {
+            const email = inputEmail.value.trim();
+            const password = inputPassword.value.trim();
+
+            if (email === VALID_USER.email && password === VALID_USER.password) {
+                localStorage.setItem('ru_digital_logged_in', 'true');
+                showApp();
+            } else {
+                loginError.classList.remove('d-none');
+            }
+        });
+    }
+
+    // Ação de Logout
+    if (btnLogout) {
+        btnLogout.addEventListener('click', () => {
+            localStorage.removeItem('ru_digital_logged_in');
+            // Limpa os campos do formulário para o próximo login
+            inputEmail.value = '';
+            inputPassword.value = '';
+            showLogin();
+        });
+    }
+
+    // Chama a verificação logo que a página carrega
+    checkAuth();
+
+    // ==========================================================================
+    // 6. BOOTSTRAP (Start)
     // ==========================================================================
     initUI();
 });

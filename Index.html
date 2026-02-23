@@ -13,7 +13,27 @@
 
 <div class="app-container">
 
-        <header class="app-header">
+    <section id="view-login" class="login-container">
+        <div class="login-box card">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <img src="assets/img/OIP.webp" alt="Logo UFCAT" style="max-height: 80px; width: auto; object-fit: contain;">
+            </div>
+            <h2 class="card-title" style="text-align: center;">Acesso RU Digital</h2>
+                
+            <div class="mt-20">
+                <input type="email" id="login-email" class="form-input" placeholder="E-mail (joao@ufcat.edu.br)" value="joao@ufcat.edu.br">
+            </div>
+            <div class="mt-20">
+                <input type="password" id="login-password" class="form-input" placeholder="Senha (123456)" value="123456">
+            </div>
+                
+            <p id="login-error" class="error-text d-none mt-20">Credenciais inválidas. Tente novamente.</p>
+                
+            <button id="btn-login" class="btn btn-primary mt-20">Entrar</button>
+        </div>
+    </section>
+
+        <header id="app-header" class="app-header d-none">
             <div class="logo-container">
                 <img src="assets/img/OIP.webp" alt="Logo UFCAT" class="logo-img">
                 <span class="logo-text">RU Digital</span>
@@ -21,7 +41,7 @@
             <i class="fa-solid fa-bell header-icon"></i>
         </header>
 
-        <main id="main-content">
+        <main id="main-content" class="d-none">
 
             <section id="view-home" class="view active">
                 <h3 class="greeting">Bem-vindo, João</h3>
@@ -117,7 +137,7 @@
 
         </main>
 
-        <nav class="bottom-nav">
+        <nav id="bottom-nav" class="bottom-nav d-none">
             <div class="nav-item active" data-target="view-home">
                 <i class="fa-solid fa-home"></i>
                 <span>Início</span>
