@@ -1,244 +1,250 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UFCAT RU - App</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RU UFCAT - Sistema Web</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Roboto',sans-serif}
+body{background:#f2f4f7}
+
+/* LOGIN */
+.login-container{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#006d5b;
+}
+.login-box{
+    background:#fff;
+    padding:40px;
+    border-radius:10px;
+    width:350px;
+}
+.login-box h2{margin-bottom:20px;text-align:center;color:#006d5b}
+.login-box input{
+    width:100%;
+    padding:10px;
+    margin-bottom:15px;
+    border:1px solid #ccc;
+    border-radius:5px;
+}
+.login-box button{
+    width:100%;
+    padding:10px;
+    background:#006d5b;
+    color:#fff;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+/* LAYOUT PRINCIPAL */
+.app{display:none;height:100vh}
+.sidebar{
+    width:220px;
+    background:#006d5b;
+    color:#fff;
+    padding:20px;
+}
+.sidebar h2{margin-bottom:30px}
+.sidebar a{
+    display:block;
+    padding:10px;
+    color:#fff;
+    text-decoration:none;
+    margin-bottom:10px;
+    border-radius:5px;
+}
+.sidebar a:hover{background:rgba(255,255,255,0.2)}
+
+.main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+}
+.header{
+    background:#fff;
+    padding:15px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+.content{
+    padding:30px;
+    overflow-y:auto;
+}
+
+.card{
+    background:#fff;
+    padding:20px;
+    border-radius:8px;
+    margin-bottom:20px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.08);
+}
+
+button.primary{
+    background:#006d5b;
+    color:#fff;
+    border:none;
+    padding:10px 15px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.view{display:none}
+.view.active{display:block}
+
+.stars span{
+    font-size:20px;
+    cursor:pointer;
+    color:#ccc;
+}
+.stars span.active{color:orange}
+
+.layout{
+    display:flex;
+    height:100%;
+}
+</style>
 </head>
 <body>
 
-    <div class="app-container">
-        
-        <header class="app-header">
-            <i class="fa-regular fa-bell header-icon"></i>
-            
-            <div class="logo-container">
-                <img src="assets/img/OIP.webp" alt="Logo UFCAT" class="logo-img">
-            </div>
-
-            <div class="profile-icon-container">
-                <i class="fa-regular fa-circle-user header-icon"></i>
-            </div>
-        </header>
-
-        <main id="main-content">
-
-            <section id="view-home" class="view active">
-                <div class="card balance-card">
-                    <div class="card-header">
-                        <span class="greeting">Olá, João</span>
-                    </div>
-                    <div class="balance-row">
-                        <span class="balance-label">Saldo Atual:</span>
-                        <span class="balance-amount">R$24,00</span>
-                    </div>
-                    <button class="btn btn-primary">Fazer Recarga</button>
-                </div>
-
-                <div class="card menu-preview-card">
-                    <h3 class="card-title">Cardápio de Hoje</h3>
-                    <div class="menu-highlight">
-                        <i class="fa-regular fa-star icon-accent"></i>
-                        <div class="menu-text">
-                            <strong>Almoço:</strong><br>
-                            Arroz, feijão e frango – ver mais
-                        </div>
-                    </div>
-                    <button class="btn btn-outline" onclick="navigateTo('view-menu')">Ver cardápio completo</button>
-                </div>
-
-                <div class="card rating-preview-card">
-                    <h3 class="card-title">O que achou do almoço de hoje?</h3>
-                    <div class="stars-static">
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                    </div>
-                    <p class="rating-date">Sua avaliação: 5/5 - 02 FEV</p>
-                </div>
-            </section>
-
-            <section id="view-menu" class="view">
-                <div class="card menu-full-card">
-                    <h3 class="card-title-lg">Cardápio de Segunda-Feira</h3>
-                    
-                    <ul class="menu-list">
-                        <li>
-                            <span class="menu-cat">Principal:</span> Frango Grelhado
-                        </li>
-                        <li>
-                            <span class="menu-cat">Guarnição:</span> Purê de Batata
-                        </li>
-                        <li>
-                            <span class="menu-cat">Arroz / Feijão:</span> Branco, Integral e Feijão Carioca
-                        </li>
-                        <li>
-                            <span class="menu-cat">Salada:</span> Alface, Tomate e Milho
-                        </li>
-                        <li>
-                            <span class="menu-cat">Sobremesa:</span> Laranja ou Gelatina
-                        </li>
-                        <li>
-                            <span class="menu-cat">Suco:</span> Caju
-                        </li>
-                    </ul>
-
-                    <button class="btn btn-outline mt-20">Ver Tabela Nutricional</button>
-                </div>
-            </section>
-
-            <section id="view-wallet" class="view">
-                <div class="card balance-card">
-                    <div class="card-header">
-                        <span class="greeting">Olá, João</span>
-                    </div>
-                    <div class="balance-row">
-                        <span class="balance-label">Saldo Atual:</span>
-                        <span class="balance-amount">R$24,00</span>
-                    </div>
-                    <button class="btn btn-primary">Fazer Recarga</button>
-                </div>
-
-                <div class="section-title">Extrato Recente</div>
-                
-                <div class="card transactions-card">
-                    <div class="transaction-item income">
-                        <div class="trans-info">01 FEV | Recarga - PIX</div>
-                        <div class="trans-value">R$ 20,00</div>
-                    </div>
-                    <div class="transaction-item expense">
-                        <div class="trans-info">02 FEV | Refeição - Almoço</div>
-                        <div class="trans-value">R$ 4,00</div>
-                    </div>
-                    <div class="transaction-item expense">
-                        <div class="trans-info">31 JAN | Refeição - Jantar</div>
-                        <div class="trans-value">R$ 4,00</div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="view-rating" class="view">
-                <div class="card">
-                    <div class="card-header">
-                        <span class="greeting">Olá, João</span>
-                    </div>
-                    <h3 class="rating-question">Como estava a refeição de hoje?</h3>
-                    <p class="rating-sub">Segunda-feira, 02 FEV | Almoço</p>
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title">Avaliação</h3>
-                    
-                    <div class="rating-criteria" data-criteria="flavor">
-                        <span>Sabor da Comida:</span>
-                        <div class="interactive-stars">
-                            <i class="fa-regular fa-star" data-val="1"></i>
-                            <i class="fa-regular fa-star" data-val="2"></i>
-                            <i class="fa-regular fa-star" data-val="3"></i>
-                            <i class="fa-regular fa-star" data-val="4"></i>
-                            <i class="fa-regular fa-star" data-val="5"></i>
-                        </div>
-                    </div>
-
-                    <div class="rating-criteria" data-criteria="temp">
-                        <span>Temperatura:</span>
-                        <div class="interactive-stars">
-                            <i class="fa-regular fa-star" data-val="1"></i>
-                            <i class="fa-regular fa-star" data-val="2"></i>
-                            <i class="fa-regular fa-star" data-val="3"></i>
-                            <i class="fa-regular fa-star" data-val="4"></i>
-                            <i class="fa-regular fa-star" data-val="5"></i>
-                        </div>
-                    </div>
-
-                    <div class="rating-criteria" data-criteria="general">
-                        <span>Geral:</span>
-                        <div class="interactive-stars">
-                            <i class="fa-regular fa-star" data-val="1"></i>
-                            <i class="fa-regular fa-star" data-val="2"></i>
-                            <i class="fa-regular fa-star" data-val="3"></i>
-                            <i class="fa-regular fa-star" data-val="4"></i>
-                            <i class="fa-regular fa-star" data-val="5"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title">Comentários e Sugestões</h3>
-                    <textarea class="comment-box" placeholder="Escreva aqui seu elogio ou sugestão..."></textarea>
-                    <button class="btn btn-primary mt-20">Enviar Avaliação</button>
-                </div>
-            </section>
-
-            <section id="view-profile" class="view">
-                <div class="profile-header">
-                    <div class="avatar-circle">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
-                    <h2 class="profile-name">João Ricardo</h2>
-                    <p class="profile-course">Ciência da Computação</p>
-                </div>
-
-                <div class="card profile-menu">
-                    <div class="profile-item">Configurações <i class="fa-solid fa-chevron-right"></i></div>
-                    <div class="profile-item">Dados Pessoais <i class="fa-solid fa-chevron-right"></i></div>
-                    <div class="profile-item">Alterar Senha <i class="fa-solid fa-chevron-right"></i></div>
-                    <div class="profile-item">Notificações <i class="fa-solid fa-chevron-right"></i></div>
-                    <div class="profile-item">Termos de Uso <i class="fa-solid fa-chevron-right"></i></div>
-                    <div class="profile-item">Sobre o RU UFCAT <i class="fa-solid fa-chevron-right"></i></div>
-                </div>
-
-                <button class="btn btn-danger-outline">Sair</button>
-            </section>
-
-        </main>
-
-        <nav class="bottom-nav">
-            <div class="nav-item active" data-target="view-home">
-                <i class="fa-solid fa-house"></i>
-                <span>Início</span>
-            </div>
-            <div class="nav-item" data-target="view-menu">
-                <i class="fa-solid fa-book-open"></i>
-                <span>Cardápio</span>
-            </div>
-            <div class="nav-item" data-target="view-wallet">
-                <i class="fa-solid fa-wallet"></i>
-                <span>Carteira</span>
-            </div>
-            <div class="nav-item" data-target="view-rating">
-                <i class="fa-solid fa-star"></i>
-                <span>Avaliação</span>
-            </div>
-            <div class="nav-item" data-target="view-profile">
-                <i class="fa-solid fa-user"></i>
-                <span>Perfil</span>
-            </div>
-        </nav>
-
-    </div>
-
-    <div id="nutrition-modal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Informação Nutricional</h3>
-            <span class="close-modal">&times;</span>
-        </div>
-        <div class="nutrition-table">
-            <div class="nutri-row"><span>Calorias</span> <strong>540 kcal</strong></div>
-            <div class="nutri-row"><span>Carboidratos</span> <strong>60g</strong></div>
-            <div class="nutri-row"><span>Proteínas</span> <strong>32g</strong></div>
-            <div class="nutri-row"><span>Gorduras Totais</span> <strong>12g</strong></div>
-            <div class="nutri-row"><span>Sódio</span> <strong>450mg</strong></div>
-        </div>
+<!-- LOGIN -->
+<div class="login-container" id="loginScreen">
+    <div class="login-box">
+        <h2>Login - RU UFCAT</h2>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Senha">
+        <button onclick="login()">Entrar</button>
+        <p id="loginError" style="color:red;display:none;margin-top:10px;">
+            Credenciais inválidas
+        </p>
     </div>
 </div>
 
-<script src="js/script.js"></script>
+<!-- SISTEMA -->
+<div class="app" id="app">
+<div class="layout">
+
+    <div class="sidebar">
+        <h2>RU UFCAT</h2>
+        <a href="#" onclick="navigate('home')">Início</a>
+        <a href="#" onclick="navigate('menu')">Cardápio</a>
+        <a href="#" onclick="navigate('wallet')">Carteira</a>
+        <a href="#" onclick="navigate('rating')">Avaliação</a>
+        <a href="#" onclick="navigate('profile')">Perfil</a>
+    </div>
+
+    <div class="main">
+        <div class="header">
+            <h3>Bem-vindo, João</h3>
+            <button class="primary" onclick="logout()">Sair</button>
+        </div>
+
+        <div class="content">
+
+            <!-- HOME -->
+            <div id="home" class="view active">
+                <div class="card">
+                    <h2>Saldo Atual</h2>
+                    <h1 style="color:#006d5b;">R$ 24,00</h1>
+                    <button class="primary">Fazer Recarga</button>
+                </div>
+
+                <div class="card">
+                    <h3>Cardápio de Hoje</h3>
+                    <p>Arroz, feijão e frango</p>
+                </div>
+            </div>
+
+            <!-- CARDÁPIO -->
+            <div id="menu" class="view">
+                <div class="card">
+                    <h2>Cardápio de Segunda-feira</h2>
+                    <p><strong>Principal:</strong> Frango Grelhado</p>
+                    <p><strong>Guarnição:</strong> Purê de Batata</p>
+                    <p><strong>Arroz / Feijão:</strong> Branco, Integral e Carioca</p>
+                    <p><strong>Salada:</strong> Alface, Tomate e Milho</p>
+                    <p><strong>Sobremesa:</strong> Laranja ou Gelatina</p>
+                </div>
+            </div>
+
+            <!-- CARTEIRA -->
+            <div id="wallet" class="view">
+                <div class="card">
+                    <h2>Extrato</h2>
+                    <p>02 FEV | Almoço - R$ 4,00</p>
+                    <p>01 FEV | Recarga PIX - R$ 20,00</p>
+                    <p>31 JAN | Jantar - R$ 4,00</p>
+                </div>
+            </div>
+
+            <!-- AVALIAÇÃO -->
+            <div id="rating" class="view">
+                <div class="card">
+                    <h2>Avaliação da Refeição</h2>
+                    <div class="stars" id="stars">
+                        <span onclick="rate(1)">★</span>
+                        <span onclick="rate(2)">★</span>
+                        <span onclick="rate(3)">★</span>
+                        <span onclick="rate(4)">★</span>
+                        <span onclick="rate(5)">★</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PERFIL -->
+            <div id="profile" class="view">
+                <div class="card">
+                    <h2>João Ricardo</h2>
+                    <p>Ciência da Computação</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</div>
+
+<script>
+const user = { email:"joao@ufcat.edu.br", password:"123456" }
+
+function login(){
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
+    if(email===user.email && pass===user.password){
+        document.getElementById("loginScreen").style.display="none";
+        document.getElementById("app").style.display="block";
+    }else{
+        document.getElementById("loginError").style.display="block";
+    }
+}
+
+function logout(){
+    document.getElementById("app").style.display="none";
+    document.getElementById("loginScreen").style.display="flex";
+}
+
+function navigate(view){
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    document.getElementById(view).classList.add("active");
+}
+
+function rate(n){
+    const stars=document.querySelectorAll("#stars span");
+    stars.forEach((s,i)=>{
+        s.classList.toggle("active",i<n);
+    });
+}
+</script>
+
 </body>
 </html>
