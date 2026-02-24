@@ -72,7 +72,7 @@ if ($basePath !== '/' && stripos($uri, $basePath) === 0) {
 // Garante que somente rotas /api/* sejam processadas aqui.
 // Qualquer outra coisa que chegou ao PHP (ex: arquivo estático inexistente)
 // recebe 404 limpo, sem entrar no roteador da API.
-if (strpos($uri, '/api') !== 0) {
+if (strpos($uri, '/api') !== 0 && $uri !== '/') {
     http_response_code(404);
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode(['status' => 'error', 'mensagem' => 'Recurso não encontrado.', 'codigo' => 404]);
@@ -84,6 +84,11 @@ $uri = substr($uri, 4);
 
 // Normaliza a URI para o formato final
 $uri = rtrim($uri, '/') ?: '/';
+
+if ($uri === '/' || $uri === '/index.html') {
+    include __DIR__ . '/index.html';
+    exit;
+}
 
 // ------------------------------------------------------------------
 // 5. LÊ O BODY JSON (para POST/PUT)
