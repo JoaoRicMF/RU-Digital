@@ -498,6 +498,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Administradores são redirecionados para o painel exclusivo
+        if (payload.tipo === 'admin') {
+            // Reutiliza o mesmo token para o admin (a chave é lida por admin.html)
+            localStorage.setItem('ru_admin_token', token);
+            window.location.href = 'admin.html';
+            return;
+        }
+
         appState.jwtPayload = payload;
         showApp();
         window.navigateTo('view-home');

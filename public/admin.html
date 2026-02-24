@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RU Digital — Painel Administrativo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        /* ==================== RESET & VARIÁVEIS ==================== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary:     #2563eb;
+            --primary-dk:  #1d4ed8;
+            --success:     #16a34a;
+            --danger:      #dc2626;
+            --warning:     #d97706;
+            --bg:          #f1f5f9;
+            --surface:     #ffffff;
+            --border:      #e2e8f0;
+            --text:        #1e293b;
+            --text-muted:  #64748b;
+            --radius:      10px;
+            --shadow:      0 2px 8px rgba(0,0,0,.08);
+            --sidebar-w:   240px;
+        }
+
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+        /* ==================== LAYOUT ==================== */
+        #admin-login    { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
+        #admin-app      { display: none; }
+
+        .admin-shell {
+            display: grid;
+            grid-template-columns: var(--sidebar-w) 1fr;
+            grid-template-rows: 56px 1fr;
+            min-height: 100vh;
+        }
+
+        /* ==================== TOPBAR ==================== */
+        .topbar {
+            grid-column: 1 / -1;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            gap: 1rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,.15);
+        }
+        .topbar .logo { font-size: 1.1rem; font-weight: 700; letter-spacing: .5px; }
+        .topbar .spacer { flex: 1; }
+        .topbar .admin-name { font-size: .9rem; opacity: .9; }
+        .topbar .btn-logout {
+            background: rgba(255,255,255,.15);
+            border: 1px solid rgba(255,255,255,.3);
+            color: #fff;
+            padding: .35rem .85rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: .85rem;
+            transition: background .2s;
+        }
+        .topbar .btn-logout:hover { background: rgba(255,255,255,.25); }
+
+        /* ==================== SIDEBAR ==================== */
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem 0;
+        }
+        .sidebar nav a {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .7rem 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: .9rem;
+            font-weight: 500;
+            transition: all .15s;
+            border-left: 3px solid transparent;
+        }
+        .sidebar nav a:hover  { background: var(--bg); color: var(--text); }
+        .sidebar nav a.active { background: #eff6ff; color: var(--primary); border-left-color: var(--primary); }
+        .sidebar nav a i      { width: 18px; text-align: center; }
+
+        /* ==================== MAIN ==================== */
+        .main-area {
+            padding: 1.75rem;
+            overflow-y: auto;
+        }
+
+        /* ==================== SEÇÕES ==================== */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* ==================== CARDS ==================== */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+        .card h2 { font-size: 1.1rem; margin-bottom: 1.25rem; color: var(--text); }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-card  { background: var(--bg); border-radius: 8px; padding: 1rem 1.25rem; }
+        .stat-card .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+        .stat-card .stat-label { font-size: .8rem; color: var(--text-muted); margin-top: .25rem; }
+
+        /* ==================== FORMULÁRIOS ==================== */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .form-group { display: flex; flex-direction: column; gap: .4rem; margin-bottom: .9rem; }
+        .form-group label { font-size: .85rem; font-weight: 600; color: var(--text-muted); }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: .55rem .8rem;
+            font-size: .9rem;
+            font-family: inherit;
+            color: var(--text);
+            transition: border-color .2s;
+            background: #fff;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus { outline: none; border-color: var(--primary); }
+        .form-group textarea { resize: vertical; min-height: 70px; }
+
+        /* ==================== ITENS DO CARDÁPIO ==================== */
+        #itens-container { border: 1px dashed var(--border); border-radius: 8px; padding: 1rem; background: var(--bg); }
+        .item-row {
+            display: grid;
+            grid-template-columns: 140px 1fr 80px 80px 80px 36px;
+            gap: .5rem;
+            align-items: center;
+            margin-bottom: .5rem;
+        }
+        .item-row input, .item-row select {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: .45rem .6rem;
+            font-size: .82rem;
+            width: 100%;
+            background: #fff;
+        }
+        .btn-remove-item {
+            background: #fee2e2;
+            color: var(--danger);
+            border: none;
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            font-size: .9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-remove-item:hover { background: #fecaca; }
+        .item-header { font-size: .75rem; font-weight: 600; color: var(--text-muted); margin-bottom: .25rem; }
+
+        /* ==================== TABELAS ==================== */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+        th { text-align: left; padding: .6rem .9rem; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); background: var(--bg); border-bottom: 1px solid var(--border); }
+        td { padding: .65rem .9rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8fafc; }
+
+        /* ==================== BADGES ==================== */
+        .badge { display: inline-block; padding: .2rem .6rem; border-radius: 99px; font-size: .75rem; font-weight: 600; }
+        .badge-admin    { background: #ede9fe; color: #6d28d9; }
+        .badge-student  { background: #dcfce7; color: #15803d; }
+        .badge-active   { background: #dcfce7; color: #15803d; }
+        .badge-inactive { background: #fee2e2; color: #b91c1c; }
+        .badge-almoco   { background: #fef3c7; color: #92400e; }
+        .badge-jantar   { background: #e0f2fe; color: #0369a1; }
+
+        /* ==================== BOTÕES ==================== */
+        .btn { display: inline-flex; align-items: center; gap: .4rem; padding: .55rem 1.1rem; border: none; border-radius: 7px; font-size: .88rem; font-weight: 600; cursor: pointer; transition: all .15s; }
+        .btn-primary  { background: var(--primary); color: #fff; }
+        .btn-primary:hover  { background: var(--primary-dk); }
+        .btn-success  { background: var(--success); color: #fff; }
+        .btn-danger   { background: var(--danger); color: #fff; }
+        .btn-ghost    { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+        .btn-ghost:hover { background: var(--border); }
+        .btn-sm { padding: .3rem .7rem; font-size: .8rem; }
+        .btn:disabled { opacity: .55; cursor: not-allowed; }
+
+        .btn-group { display: flex; gap: .5rem; flex-wrap: wrap; }
+
+        /* ==================== FILTROS ==================== */
+        .filter-bar { display: flex; gap: .75rem; align-items: flex-end; flex-wrap: wrap; margin-bottom: 1.25rem; }
+        .filter-bar .form-group { margin-bottom: 0; }
+
+        /* ==================== STARS ==================== */
+        .stars { color: #f59e0b; font-size: .85rem; }
+
+        /* ==================== TOAST ==================== */
+        #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: .5rem; }
+        .toast { background: #1e293b; color: #fff; padding: .75rem 1.2rem; border-radius: 8px; font-size: .88rem; box-shadow: 0 4px 12px rgba(0,0,0,.2); animation: slideIn .3s ease; max-width: 320px; }
+        .toast.success { background: var(--success); }
+        .toast.error   { background: var(--danger); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* ==================== LOGIN ==================== */
+        .login-box {
+            background: var(--surface);
+            border-radius: 14px;
+            box-shadow: 0 8px 32px rgba(0,0,0,.1);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 380px;
+        }
+        .login-box h1 { font-size: 1.4rem; margin-bottom: .3rem; }
+        .login-box p  { color: var(--text-muted); font-size: .9rem; margin-bottom: 1.75rem; }
+        .login-box .btn { width: 100%; justify-content: center; margin-top: .5rem; padding: .7rem; font-size: .95rem; }
+        .error-msg { color: var(--danger); font-size: .85rem; margin-top: .5rem; display: none; }
+
+        /* ==================== MODAL ==================== */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-overlay.open { display: flex; }
+        .modal-box { background: var(--surface); border-radius: 12px; padding: 1.75rem; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; box-shadow: 0 16px 48px rgba(0,0,0,.2); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+        .modal-header h3 { font-size: 1.05rem; }
+        .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); }
+        .modal-close:hover { color: var(--text); }
+
+        /* ==================== PAGINAÇÃO ==================== */
+        .pagination { display: flex; gap: .4rem; justify-content: center; margin-top: 1rem; }
+        .page-btn { padding: .35rem .7rem; border: 1px solid var(--border); background: #fff; border-radius: 6px; cursor: pointer; font-size: .85rem; }
+        .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .page-btn:disabled { opacity: .4; cursor: default; }
+
+        /* ==================== RESPONSIVO ==================== */
+        @media (max-width: 768px) {
+            .admin-shell { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .sidebar.open { display: block; position: fixed; top: 56px; left: 0; bottom: 0; z-index: 100; width: var(--sidebar-w); box-shadow: 4px 0 16px rgba(0,0,0,.1); }
+            .form-row { grid-template-columns: 1fr; }
+            .item-row { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===================== TOAST ===================== -->
+<div id="toast-container"></div>
+
+<!-- ===================== TELA DE LOGIN ===================== -->
+<div id="admin-login">
+    <div class="login-box">
+        <h1>🏛️ RU Digital</h1>
+        <p>Área Administrativa — acesso restrito</p>
+
+        <div class="form-group">
+            <label for="login-email">E-mail</label>
+            <input type="email" id="login-email" placeholder="admin@ufcat.edu.br" autocomplete="username" />
+        </div>
+        <div class="form-group">
+            <label for="login-password">Senha</label>
+            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <p class="error-msg" id="login-error"></p>
+        <button class="btn btn-primary" id="btn-admin-login">
+            <i class="fa-solid fa-right-to-bracket"></i> Entrar
+        </button>
+    </div>
+</div>
+
+<!-- ===================== APP ADMIN ===================== -->
+<div id="admin-app">
+    <div class="admin-shell">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <button id="btn-menu-toggle" style="background:none;border:none;color:#fff;font-size:1.1rem;cursor:pointer;display:none">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <span class="logo"><i class="fa-solid fa-utensils"></i> RU Digital Admin</span>
+            <span class="spacer"></span>
+            <span class="admin-name" id="topbar-admin-name"></span>
+            <button class="btn-logout" id="btn-admin-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button>
+        </header>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <nav>
+                <a href="#" class="active" data-section="sec-dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+                <a href="#" data-section="sec-menu"><i class="fa-solid fa-bowl-food"></i> Cardápio</a>
+                <a href="#" data-section="sec-users"><i class="fa-solid fa-users"></i> Utilizadores</a>
+                <a href="#" data-section="sec-ratings"><i class="fa-solid fa-star"></i> Avaliações</a>
+            </nav>
+        </aside>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <main class="main-area">
+
+            <!-- =============== DASHBOARD =============== -->
+            <section class="section active" id="sec-dashboard">
+                <div class="card">
+                    <h2>Resumo do Dia</h2>
+                    <div class="card-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="dash-total-avaliacoes">—</div>
+                            <div class="stat-label">Avaliações hoje</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="dash-media-geral">—</div>
+                            <div class="stat-label">Média geral hoje</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="dash-cardapios-hoje">—</div>
+                            <div class="stat-label">Refeições lançadas hoje</div>
+                        </div>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:.85rem">Use o menu lateral para gerenciar cardápios, utilizadores e ver relatórios detalhados.</p>
+                </div>
+            </section>
+
+            <!-- =============== CARDÁPIO =============== -->
+            <section class="section" id="sec-menu">
+                <div class="card">
+                    <h2>Gestão de Cardápio</h2>
+
+                    <!-- Filtro de data -->
+                    <div class="filter-bar">
+                        <div class="form-group">
+                            <label>Data</label>
+                            <input type="date" id="menu-filter-date" />
+                        </div>
+                        <button class="btn btn-ghost" id="btn-menu-search"><i class="fa-solid fa-magnifying-glass"></i> Pesquisar</button>
+                        <button class="btn btn-primary" id="btn-menu-new"><i class="fa-solid fa-plus"></i> Novo Cardápio</button>
+                    </div>
+
+                    <!-- Tabela de cardápios -->
+                    <div class="table-wrap">
+                        <table id="menu-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Data</th>
+                                    <th>Refeição</th>
+                                    <th>Itens</th>
+                                    <th>Estado</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="menu-tbody">
+                                <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem">Selecione uma data e pesquise.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- =============== UTILIZADORES =============== -->
+            <section class="section" id="sec-users">
+                <div class="card">
+                    <h2>Gestão de Utilizadores</h2>
+                    <div class="filter-bar">
+                        <div class="form-group">
+                            <label>Pesquisar</label>
+                            <input type="text" id="user-search" placeholder="Nome ou e-mail..." style="width:220px" />
+                        </div>
+                        <button class="btn btn-ghost" id="btn-user-search"><i class="fa-solid fa-magnifying-glass"></i> Pesquisar</button>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Curso</th>
+                                    <th>Perfil</th>
+                                    <th>Estado</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-tbody">
+                                <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem">Clique em Pesquisar para carregar.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="users-pagination"></div>
+                </div>
+            </section>
+
+            <!-- =============== AVALIAÇÕES =============== -->
+            <section class="section" id="sec-ratings">
+                <div class="card">
+                    <h2>Relatório de Avaliações</h2>
+                    <div class="filter-bar">
+                        <div class="form-group">
+                            <label>Data</label>
+                            <input type="date" id="rating-filter-date" />
+                        </div>
+                        <div class="form-group">
+                            <label>Refeição</label>
+                            <select id="rating-filter-meal" style="padding:.55rem .8rem;border:1px solid var(--border);border-radius:7px;font-size:.9rem">
+                                <option value="">Todas</option>
+                                <option value="almoco">Almoço</option>
+                                <option value="jantar">Jantar</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-ghost" id="btn-rating-search"><i class="fa-solid fa-magnifying-glass"></i> Pesquisar</button>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Refeição</th>
+                                    <th>Total</th>
+                                    <th>Sabor</th>
+                                    <th>Temp.</th>
+                                    <th>Atend.</th>
+                                    <th>Limpeza</th>
+                                    <th>Geral</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ratings-tbody">
+                                <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:2rem">Selecione os filtros e pesquise.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="comments-section" style="margin-top:1.5rem; display:none">
+                        <h3 style="font-size:.95rem; margin-bottom:.75rem; color:var(--text-muted)">Comentários recentes</h3>
+                        <div id="comments-list"></div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<!-- =============== MODAL: Criar / Editar Cardápio =============== -->
+<div class="modal-overlay" id="menu-modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 id="menu-modal-title">Novo Cardápio</h3>
+            <button class="modal-close" id="close-menu-modal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <input type="hidden" id="menu-edit-id" />
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="menu-data">Data *</label>
+                <input type="date" id="menu-data" required />
+            </div>
+            <div class="form-group">
+                <label for="menu-refeicao">Refeição *</label>
+                <select id="menu-refeicao">
+                    <option value="almoco">Almoço</option>
+                    <option value="jantar">Jantar</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-bottom:.75rem; display:flex; justify-content:space-between; align-items:center">
+            <label style="font-size:.85rem; font-weight:600; color:var(--text-muted)">Itens do Cardápio *</label>
+            <button class="btn btn-ghost btn-sm" id="btn-add-item"><i class="fa-solid fa-plus"></i> Adicionar item</button>
+        </div>
+
+        <!-- Cabeçalho da grelha de itens -->
+        <div class="item-row item-header">
+            <span>Categoria</span>
+            <span>Descrição</span>
+            <span>Cal.</span>
+            <span>Prot.(g)</span>
+            <span>Carb.(g)</span>
+            <span></span>
+        </div>
+        <div id="itens-container"></div>
+
+        <div class="btn-group" style="margin-top:1.25rem; justify-content:flex-end">
+            <button class="btn btn-ghost" id="btn-cancel-menu">Cancelar</button>
+            <button class="btn btn-primary" id="btn-save-menu"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- =============== MODAL: Editar Utilizador =============== -->
+<div class="modal-overlay" id="user-modal">
+    <div class="modal-box" style="max-width:400px">
+        <div class="modal-header">
+            <h3>Editar Utilizador</h3>
+            <button class="modal-close" id="close-user-modal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <input type="hidden" id="user-edit-id" />
+        <div class="form-group">
+            <label>Nome</label>
+            <input type="text" id="user-edit-name" disabled style="background:var(--bg)" />
+        </div>
+        <div class="form-group">
+            <label for="user-edit-tipo">Perfil</label>
+            <select id="user-edit-tipo">
+                <option value="estudante">Estudante</option>
+                <option value="admin">Administrador</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="user-edit-ativo">Estado</label>
+            <select id="user-edit-ativo">
+                <option value="1">Ativo</option>
+                <option value="0">Inativo</option>
+            </select>
+        </div>
+        <div class="btn-group" style="justify-content:flex-end; margin-top:1rem">
+            <button class="btn btn-ghost" id="btn-cancel-user">Cancelar</button>
+            <button class="btn btn-primary" id="btn-save-user"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ================================================================
+//  admin.js — Lógica completa do painel administrativo
+// ================================================================
+(function () {
+    const API_BASE = 'http://localhost:8000/api';
+
+    // ── Utilitários ──────────────────────────────────────────────
+    function token()  { return localStorage.getItem('ru_admin_token'); }
+    function payload(){ 
+        try { 
+            const t = token(); if (!t) return null;
+            return JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); 
+        } catch { return null; } 
+    }
+
+    async function apiFetch(endpoint, opts = {}) {
+        const headers = { 'Content-Type': 'application/json', ...(token() ? { 'Authorization': `Bearer ${token()}` } : {}), ...(opts.headers ?? {}) };
+        const res = await fetch(`${API_BASE}${endpoint}`, { ...opts, headers });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.mensagem ?? `Erro ${res.status}`);
+        return data;
+    }
+
+    function toast(msg, type = '') {
+        const el = document.createElement('div');
+        el.className = 'toast ' + type;
+        el.textContent = msg;
+        document.getElementById('toast-container').appendChild(el);
+        setTimeout(() => el.remove(), 3500);
+    }
+
+    function starsHtml(val) {
+        if (val === null || val === undefined) return '<span style="color:var(--text-muted)">—</span>';
+        const full  = Math.round(val);
+        let   stars = '';
+        for (let i = 1; i <= 5; i++) stars += `<i class="fa-${i <= full ? 'solid' : 'regular'} fa-star"></i>`;
+        return `<span class="stars">${stars}</span> <small>${Number(val).toFixed(1)}</small>`;
+    }
+
+    // ── Auth ─────────────────────────────────────────────────────
+    function checkAuth() {
+        const p = payload();
+        if (!p || p.exp < Date.now() / 1000 || p.tipo !== 'admin') {
+            document.getElementById('admin-login').style.display = 'flex';
+            document.getElementById('admin-app').style.display   = 'none';
+            return false;
+        }
+        document.getElementById('admin-login').style.display = 'none';
+        document.getElementById('admin-app').style.display   = 'block';
+        document.getElementById('topbar-admin-name').textContent = p.nome;
+        return true;
+    }
+
+    document.getElementById('btn-admin-login').addEventListener('click', async () => {
+        const email = document.getElementById('login-email').value.trim();
+        const senha = document.getElementById('login-password').value;
+        const errEl = document.getElementById('login-error');
+        errEl.style.display = 'none';
+
+        try {
+            const resp = await apiFetch('/auth/login', { method: 'POST', body: JSON.stringify({ email, senha }) });
+            const t    = resp.token ?? resp.data?.token;
+            const p    = JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+
+            if (p.tipo !== 'admin') {
+                errEl.textContent = 'Esta conta não tem permissão de administrador.';
+                errEl.style.display = 'block';
+                return;
+            }
+
+            localStorage.setItem('ru_admin_token', t);
+            if (checkAuth()) loadDashboard();
+
+        } catch (err) {
+            errEl.textContent = err.message || 'Erro ao conectar.';
+            errEl.style.display = 'block';
+        }
+    });
+
+    document.getElementById('btn-admin-logout').addEventListener('click', () => {
+        localStorage.removeItem('ru_admin_token');
+        checkAuth();
+    });
+
+    // ── Navegação ────────────────────────────────────────────────
+    document.querySelectorAll('.sidebar nav a').forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            document.querySelectorAll('.sidebar nav a').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+            const sectionId = link.dataset.section;
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+        });
+    });
+
+    // ── Dashboard ────────────────────────────────────────────────
+    async function loadDashboard() {
+        const today = new Date().toISOString().split('T')[0];
+        try {
+            const [rat, men] = await Promise.all([
+                apiFetch(`/admin/avaliacoes?data=${today}`),
+                apiFetch(`/admin/cardapio?data=${today}`),
+            ]);
+
+            const resumo  = rat.data.resumo ?? [];
+            const totalAv = resumo.reduce((s, r) => s + (r.total_avaliacoes || 0), 0);
+            const medias  = resumo.filter(r => r.media_geral).map(r => parseFloat(r.media_geral));
+            const mediaG  = medias.length ? (medias.reduce((a,b) => a+b) / medias.length).toFixed(1) : '—';
+
+            document.getElementById('dash-total-avaliacoes').textContent = totalAv;
+            document.getElementById('dash-media-geral').textContent      = mediaG;
+            document.getElementById('dash-cardapios-hoje').textContent   = (men.data.cardapios ?? []).length;
+        } catch { /* silencioso */ }
+    }
+
+    // ── Cardápio — Listagem ──────────────────────────────────────
+    document.getElementById('menu-filter-date').value = new Date().toISOString().split('T')[0];
+
+    document.getElementById('btn-menu-search').addEventListener('click', loadMenuTable);
+
+    async function loadMenuTable() {
+        const date  = document.getElementById('menu-filter-date').value;
+        const tbody = document.getElementById('menu-tbody');
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1.5rem">Carregando…</td></tr>';
+        try {
+            const resp     = await apiFetch(`/admin/cardapio?data=${date}`);
+            const cardapios = resp.data.cardapios ?? [];
+            if (!cardapios.length) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:1.5rem">Nenhum cardápio para esta data.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            cardapios.forEach(c => {
+                const refeicaoLabel = c.refeicao === 'almoco' ? 'Almoço' : 'Jantar';
+                const badgeRef      = c.refeicao === 'almoco' ? 'badge-almoco' : 'badge-jantar';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${c.id}</td>
+                    <td>${c.data_ref}</td>
+                    <td><span class="badge ${badgeRef}">${refeicaoLabel}</span></td>
+                    <td>${c.itens.length} item(ns)</td>
+                    <td><span class="badge ${c.ativo ? 'badge-active' : 'badge-inactive'}">${c.ativo ? 'Ativo' : 'Inativo'}</span></td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-ghost btn-sm btn-edit-menu" data-id="${c.id}"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-danger btn-sm btn-del-menu" data-id="${c.id}"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            // Guarda para edição
+            window._menuData = cardapios;
+        } catch (err) {
+            tbody.innerHTML = `<tr><td colspan="6" style="color:var(--danger);text-align:center;padding:1.5rem">${err.message}</td></tr>`;
+        }
+    }
+
+    document.getElementById('menu-tbody').addEventListener('click', async e => {
+        const editBtn = e.target.closest('.btn-edit-menu');
+        const delBtn  = e.target.closest('.btn-del-menu');
+        if (editBtn) openEditMenu(parseInt(editBtn.dataset.id));
+        if (delBtn)  deleteMenu(parseInt(delBtn.dataset.id));
+    });
+
+    // ── Cardápio — Modal Criar / Editar ──────────────────────────
+    const CATEGORIAS = ['principal','guarnicao','arroz_feijao','salada','sobremesa','suco','outro'];
+
+    function buildItemRow(item = {}) {
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        const options = CATEGORIAS.map(c => `<option value="${c}" ${item.categoria===c?'selected':''}>${c}</option>`).join('');
+        row.innerHTML = `
+            <select class="item-cat">${options}</select>
+            <input  type="text"   class="item-desc"  placeholder="Descrição *"     value="${item.descricao||''}" required />
+            <input  type="number" class="item-kcal"  placeholder="—"               value="${item.calorias||''}" min="0" />
+            <input  type="number" class="item-prot"  placeholder="—"               value="${item.proteinas_g||''}" step=".1" min="0" />
+            <input  type="number" class="item-carb"  placeholder="—"               value="${item.carboidratos_g||''}" step=".1" min="0" />
+            <button type="button" class="btn-remove-item" title="Remover"><i class="fa-solid fa-xmark"></i></button>
+        `;
+        row.querySelector('.btn-remove-item').addEventListener('click', () => row.remove());
+        return row;
+    }
+
+    function openNewMenu() {
+        document.getElementById('menu-modal-title').textContent = 'Novo Cardápio';
+        document.getElementById('menu-edit-id').value    = '';
+        document.getElementById('menu-data').value       = new Date().toISOString().split('T')[0];
+        document.getElementById('menu-refeicao').value   = 'almoco';
+        const cont = document.getElementById('itens-container');
+        cont.innerHTML = '';
+        // Adiciona itens padrão
+        ['principal','guarnicao','arroz_feijao','salada','sobremesa'].forEach(cat => {
+            cont.appendChild(buildItemRow({ categoria: cat }));
+        });
+        document.getElementById('menu-modal').classList.add('open');
+    }
+
+    function openEditMenu(id) {
+        const cardapio = (window._menuData || []).find(c => c.id === id);
+        if (!cardapio) return;
+        document.getElementById('menu-modal-title').textContent = `Editar Cardápio #${id}`;
+        document.getElementById('menu-edit-id').value  = id;
+        document.getElementById('menu-data').value     = cardapio.data_ref;
+        document.getElementById('menu-refeicao').value = cardapio.refeicao;
+        const cont = document.getElementById('itens-container');
+        cont.innerHTML = '';
+        cardapio.itens.forEach(item => cont.appendChild(buildItemRow(item)));
+        document.getElementById('menu-modal').classList.add('open');
+    }
+
+    document.getElementById('btn-menu-new').addEventListener('click', openNewMenu);
+    document.getElementById('btn-add-item').addEventListener('click', () => {
+        document.getElementById('itens-container').appendChild(buildItemRow());
+    });
+    document.getElementById('close-menu-modal').addEventListener('click', () => document.getElementById('menu-modal').classList.remove('open'));
+    document.getElementById('btn-cancel-menu').addEventListener('click', () => document.getElementById('menu-modal').classList.remove('open'));
+
+    document.getElementById('btn-save-menu').addEventListener('click', async function() {
+        const id       = document.getElementById('menu-edit-id').value;
+        const dataRef  = document.getElementById('menu-data').value;
+        const refeicao = document.getElementById('menu-refeicao').value;
+        const rows     = document.getElementById('itens-container').querySelectorAll('.item-row');
+
+        if (!dataRef) { toast('Selecione uma data.', 'error'); return; }
+        if (!rows.length) { toast('Adicione pelo menos um item.', 'error'); return; }
+
+        const itens = [];
+        let valid = true;
+        rows.forEach((row, i) => {
+            const desc = row.querySelector('.item-desc').value.trim();
+            if (!desc) { toast(`Item ${i+1}: descrição obrigatória.`, 'error'); valid = false; return; }
+            itens.push({
+                categoria:      row.querySelector('.item-cat').value,
+                descricao:      desc,
+                calorias:       row.querySelector('.item-kcal').value || null,
+                proteinas_g:    row.querySelector('.item-prot').value || null,
+                carboidratos_g: row.querySelector('.item-carb').value || null,
+            });
+        });
+        if (!valid) return;
+
+        this.disabled = true;
+        try {
+            const body = { data_ref: dataRef, refeicao, itens };
+            if (id) {
+                await apiFetch(`/admin/cardapio/${id}`, { method: 'PUT',  body: JSON.stringify(body) });
+                toast('Cardápio atualizado!', 'success');
+            } else {
+                await apiFetch('/admin/cardapio',        { method: 'POST', body: JSON.stringify(body) });
+                toast('Cardápio criado!', 'success');
+            }
+            document.getElementById('menu-modal').classList.remove('open');
+            loadMenuTable();
+        } catch (err) {
+            toast(err.message, 'error');
+        } finally {
+            this.disabled = false;
+        }
+    });
+
+    async function deleteMenu(id) {
+        if (!confirm(`Desativar o cardápio #${id}?`)) return;
+        try {
+            await apiFetch(`/admin/cardapio/${id}`, { method: 'DELETE' });
+            toast('Cardápio desativado.', 'success');
+            loadMenuTable();
+        } catch (err) {
+            toast(err.message, 'error');
+        }
+    }
+
+    // ── Utilizadores ────────────────────────────────────────────
+    let userPage = 1;
+
+    document.getElementById('btn-user-search').addEventListener('click', () => { userPage = 1; loadUsers(); });
+    document.getElementById('user-search').addEventListener('keydown', e => { if (e.key === 'Enter') { userPage = 1; loadUsers(); } });
+
+    async function loadUsers() {
+        const search = document.getElementById('user-search').value.trim();
+        const tbody  = document.getElementById('users-tbody');
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1.5rem">Carregando…</td></tr>';
+        try {
+            const resp  = await apiFetch(`/admin/usuarios?page=${userPage}&limit=15&search=${encodeURIComponent(search)}`);
+            const users = resp.data.usuarios ?? [];
+            if (!users.length) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:1.5rem">Nenhum utilizador encontrado.</td></tr>';
+            } else {
+                tbody.innerHTML = '';
+                users.forEach(u => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${u.nome}</td>
+                        <td style="color:var(--text-muted);font-size:.85rem">${u.email}</td>
+                        <td style="font-size:.85rem">${u.curso ?? '—'}</td>
+                        <td><span class="badge ${u.tipo==='admin'?'badge-admin':'badge-student'}">${u.tipo}</span></td>
+                        <td><span class="badge ${u.ativo?'badge-active':'badge-inactive'}">${u.ativo?'Ativo':'Inativo'}</span></td>
+                        <td><button class="btn btn-ghost btn-sm btn-edit-user" data-id="${u.id}" data-nome="${u.nome}" data-tipo="${u.tipo}" data-ativo="${u.ativo}"><i class="fa-solid fa-pen"></i> Editar</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+            renderUserPagination(resp.data.total, resp.data.limite);
+        } catch (err) {
+            tbody.innerHTML = `<tr><td colspan="6" style="color:var(--danger);padding:1.5rem">${err.message}</td></tr>`;
+        }
+    }
+
+    function renderUserPagination(total, limit) {
+        const pages = Math.ceil(total / limit);
+        const pg    = document.getElementById('users-pagination');
+        pg.innerHTML = '';
+        for (let i = 1; i <= pages; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'page-btn' + (i === userPage ? ' active' : '');
+            btn.textContent = i;
+            btn.addEventListener('click', () => { userPage = i; loadUsers(); });
+            pg.appendChild(btn);
+        }
+    }
+
+    document.getElementById('users-tbody').addEventListener('click', e => {
+        const btn = e.target.closest('.btn-edit-user');
+        if (!btn) return;
+        document.getElementById('user-edit-id').value    = btn.dataset.id;
+        document.getElementById('user-edit-name').value  = btn.dataset.nome;
+        document.getElementById('user-edit-tipo').value  = btn.dataset.tipo;
+        document.getElementById('user-edit-ativo').value = btn.dataset.ativo;
+        document.getElementById('user-modal').classList.add('open');
+    });
+
+    document.getElementById('close-user-modal').addEventListener('click', () => document.getElementById('user-modal').classList.remove('open'));
+    document.getElementById('btn-cancel-user').addEventListener('click', () => document.getElementById('user-modal').classList.remove('open'));
+
+    document.getElementById('btn-save-user').addEventListener('click', async function() {
+        const id    = document.getElementById('user-edit-id').value;
+        const tipo  = document.getElementById('user-edit-tipo').value;
+        const ativo = document.getElementById('user-edit-ativo').value;
+        this.disabled = true;
+        try {
+            await apiFetch(`/admin/usuarios/${id}`, { method: 'PUT', body: JSON.stringify({ tipo, ativo: parseInt(ativo) }) });
+            toast('Utilizador atualizado!', 'success');
+            document.getElementById('user-modal').classList.remove('open');
+            loadUsers();
+        } catch (err) {
+            toast(err.message, 'error');
+        } finally {
+            this.disabled = false;
+        }
+    });
+
+    // ── Avaliações ───────────────────────────────────────────────
+    document.getElementById('rating-filter-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('btn-rating-search').addEventListener('click', loadRatings);
+
+    async function loadRatings() {
+        const date    = document.getElementById('rating-filter-date').value;
+        const meal    = document.getElementById('rating-filter-meal').value;
+        const tbody   = document.getElementById('ratings-tbody');
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:1.5rem">Carregando…</td></tr>';
+        try {
+            let url = '/admin/avaliacoes';
+            const params = [];
+            if (date) params.push(`data=${date}`);
+            if (meal) params.push(`refeicao=${meal}`);
+            if (params.length) url += '?' + params.join('&');
+
+            const resp    = await apiFetch(url);
+            const resumo  = resp.data.resumo ?? [];
+            const coments = resp.data.comentarios ?? [];
+
+            if (!resumo.length) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:1.5rem">Sem avaliações para este filtro.</td></tr>';
+            } else {
+                tbody.innerHTML = '';
+                resumo.forEach(r => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${r.data_ref}</td>
+                        <td><span class="badge ${r.refeicao==='almoco'?'badge-almoco':'badge-jantar'}">${r.refeicao==='almoco'?'Almoço':'Jantar'}</span></td>
+                        <td><strong>${r.total_avaliacoes}</strong></td>
+                        <td>${starsHtml(r.media_sabor)}</td>
+                        <td>${starsHtml(r.media_temperatura)}</td>
+                        <td>${starsHtml(r.media_atendimento)}</td>
+                        <td>${starsHtml(r.media_limpeza)}</td>
+                        <td>${starsHtml(r.media_geral)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            const sec = document.getElementById('comments-section');
+            const lst = document.getElementById('comments-list');
+            if (coments.length) {
+                sec.style.display = 'block';
+                lst.innerHTML = coments.map(c => `
+                    <div style="background:var(--bg);border-radius:8px;padding:.85rem 1rem;margin-bottom:.6rem;font-size:.88rem">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:.3rem">
+                            <strong>${c.autor}</strong>
+                            <span class="stars">${'★'.repeat(c.nota_geral ?? 0)}</span>
+                        </div>
+                        <p style="color:var(--text-muted)">${c.comentario}</p>
+                    </div>
+                `).join('');
+            } else {
+                sec.style.display = 'none';
+            }
+        } catch (err) {
+            tbody.innerHTML = `<tr><td colspan="8" style="color:var(--danger);padding:1.5rem">${err.message}</td></tr>`;
+        }
+    }
+
+    // ── Fechar modais ao clicar no overlay ───────────────────────
+    document.querySelectorAll('.modal-overlay').forEach(m => {
+        m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+    });
+
+    // ── Enter no login ────────────────────────────────────────────
+    document.getElementById('login-password').addEventListener('keydown', e => {
+        if (e.key === 'Enter') document.getElementById('btn-admin-login').click();
+    });
+
+    // ── Init ─────────────────────────────────────────────────────
+    if (checkAuth()) loadDashboard();
+})();
+</script>
+</body>
+</html>

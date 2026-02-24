@@ -46,7 +46,7 @@ class AuthController
 
         // 3. Busca usuário no banco (prepared statement protege de SQL Injection)
         $stmt = $this->db->prepare(
-            'SELECT id, nome, email, senha_hash, curso, saldo
+            'SELECT id, nome, email, senha_hash, curso, saldo, tipo
              FROM   usuarios
              WHERE  email = :email AND ativo = 1
              LIMIT  1'
@@ -87,6 +87,7 @@ class AuthController
             'nome' => $user['nome'],
             'iat'  => $agora,
             'exp'  => $agora + $exp,
+            'tipo' => $user['tipo'],
         ];
 
         $token = JWT::encode($payload, $_ENV['JWT_SECRET'], 'HS256');
@@ -101,6 +102,7 @@ class AuthController
                 'email' => $user['email'],
                 'curso' => $user['curso'],
                 'saldo' => (float) $user['saldo'],
+                'tipo'  => $user['tipo'],
             ],
         ]);
     }
