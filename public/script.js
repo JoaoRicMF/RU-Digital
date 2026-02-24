@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         user:         { name: '', balance: 0 },
         transactions: [],
         jwtPayload:   null, // payload decodificado do JWT
+        cardapioId:   null, // ID real do cardápio do dia, preenchido por refreshMenu()
     };
 
     const currencyFormatter = new Intl.NumberFormat('pt-BR', {
@@ -66,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------
     function updateBalanceUI() {
         document.querySelectorAll('.balance-display').forEach(el => {
+            el.classList.remove('skeleton');
             el.textContent = currencyFormatter.format(appState.user.balance);
         });
     }
@@ -127,10 +129,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const almoco = cardapios.find(c => c.refeicao === 'almoco');
 
             if (almoco) {
+                // Guarda o ID real do cardápio para uso no envio de avaliações
+                appState.cardapioId = almoco.id ?? null;
+
                 const principal = almoco.itens.find(i => i.categoria === 'principal');
                 const guarnição = almoco.itens.find(i => i.categoria === 'guarnicao');
                 const menuEl = document.getElementById('home-menu-text');
                 if (menuEl && principal) {
+                    menuEl.classList.remove('skeleton-text', 'skel-menu');
                     menuEl.textContent = [principal?.descricao, guarnição?.descricao]
                         .filter(Boolean).join(', ');
                 }
@@ -278,6 +284,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Garante que o cardápio do dia foi carregado antes de enviar
+        if (!appState.cardapioId) {
+            alert('Não foi possível identificar o cardápio do dia. Tente novamente em instantes.');
+            return;
+        }
+
         const btn = this;
         btn.disabled = true;
 
@@ -285,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const resp = await apiFetch('/avaliacao', {
                 method: 'POST',
                 body: JSON.stringify({
-                    cardapio_id: 1, // TODO: usar o ID real do cardápio do dia
+                    cardapio_id: appState.cardapioId, // ID real do cardápio carregado via API
                     ...notas,
                     comentario: commentBox?.value.trim() ?? '',
                 }),
@@ -412,11 +424,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ email, senha }),
             });
 
-            localStorage.setItem('ru_jwt_token', resp.token);
-            appState.user.balance = resp.data.usuario.saldo;
+            // O token pode estar em resp.token ou resp.data.token dependendo
+            // de como o AuthController serializa a resposta.
+            // Testa os dois caminhos para ser robusto.
+            const token = resp.token ?? resp.data?.token;
+            const saldo = resp.data?.usuario?.saldo ?? resp.data?.saldo ?? 0;
+
+            if (!token) {
+                console.error('[login] Resposta da API não contém token:', resp);
+                errorEl.classList.remove('d-none');
+                return;
+            }
+
+            localStorage.setItem('ru_jwt_token', token);
+            appState.user.balance = saldo;
             checkAuth();
 
-        } catch {
+        } catch (err) {
+            console.error('[login] Erro:', err.message);
             errorEl.classList.remove('d-none');
         } finally {
             btnLogin.classList.remove('is-loading');

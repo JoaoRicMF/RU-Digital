@@ -332,7 +332,7 @@ body {
 .login-input {
     width: 100%; max-width: 280px; padding: 14px 15px; border-radius: 8px; border: none; margin-bottom: 15px; font-size: 1rem; color: #333;
 }
-.btn-text { background: transparent; color: white; border: none; font-size: 1.1rem; font-weight: 700; cursor: pointer; margin-top: 10px; }
+.btn-text { background: transparent; color: white; border: none; font-size: 1.1rem; font-weight: 700; cursor: pointer; margin-top: 10px; position: relative; }
 .error-text { color: #FFCDD2; font-size: 0.9rem; text-align: center; margin-bottom: 15px; }
 .d-none { display: none !important; }
 
@@ -518,7 +518,8 @@ body {
    ========================================================================== */
 
 /* Spinner no botão (Desativa o clique e esconde o texto) */
-.btn.is-loading {
+.btn.is-loading,
+.btn-text.is-loading {
     position: relative;
     color: transparent !important; /* Esconde o texto "Confirmar Recarga" */
     pointer-events: none; /* Bloqueia cliques duplos! */
@@ -530,7 +531,8 @@ body {
     100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-.btn.is-loading::after {
+.btn.is-loading::after,
+.btn-text.is-loading::after {
     content: "\f110"; /* Código do ícone fa-spinner do FontAwesome */
     font-family: "Font Awesome 6 Free";
     font-weight: 900;

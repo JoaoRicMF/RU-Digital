@@ -31,11 +31,14 @@ class Database
 
     private static function connect(): PDO
     {
-        $host    = $_ENV['DB_HOST'] ?? 'localhost';
+        // Sem fallbacks para credenciais: se as variáveis de ambiente não
+        // estiverem definidas, a aplicação deve falhar de forma explícita
+        // em vez de tentar conectar com valores padrão silenciosamente.
+        $host    = $_ENV['DB_HOST'];
         $port    = $_ENV['DB_PORT'] ?? '3306';
-        $dbname  = $_ENV['DB_NAME'] ?? 'ru_digital';
-        $user    = $_ENV['DB_USER'] ?? 'root';
-        $pass    = $_ENV['DB_PASS'] ?? '1504';
+        $dbname  = $_ENV['DB_NAME'];
+        $user    = $_ENV['DB_USER'];
+        $pass    = $_ENV['DB_PASS'];
 
         $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
 

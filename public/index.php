@@ -34,8 +34,8 @@ $envPath = realpath(__DIR__ . DIRECTORY_SEPARATOR . '..') ?: dirname(__DIR__);
 $dotenv = Dotenv::createImmutable($envPath);
 $dotenv->load();
 
-// Valida variáveis obrigatórias
-$dotenv->required(['DB_HOST', 'DB_NAME', 'DB_USER', 'JWT_SECRET'])->notEmpty();
+// Valida variáveis obrigatórias (incluindo APP_URL para o CORS)
+$dotenv->required(['DB_HOST', 'DB_NAME', 'DB_USER', 'JWT_SECRET', 'APP_URL'])->notEmpty();
 $dotenv->required(['DB_PASS']);
 
 // ------------------------------------------------------------------
@@ -47,7 +47,8 @@ date_default_timezone_set('America/Sao_Paulo');
 // 3. TRATA PREFLIGHT CORS (OPTIONS)
 // ------------------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    header('Access-Control-Allow-Origin: ' . ($_ENV['APP_URL'] ?? '*'));
+    // APP_URL é validado como obrigatório na inicialização: sem fallback para '*'
+    header('Access-Control-Allow-Origin: ' . $_ENV['APP_URL']);
     header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization');
     http_response_code(204);
