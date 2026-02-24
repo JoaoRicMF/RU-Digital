@@ -58,6 +58,7 @@ class MenuController
             $ref = $row['refeicao'];
             if (!isset($cardapios[$ref])) {
                 $cardapios[$ref] = [
+                    'id'       => $row['id'],
                     'refeicao' => $ref,
                     'itens'    => [],
                 ];
