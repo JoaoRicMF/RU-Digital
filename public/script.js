@@ -1,16 +1,9 @@
-// =============================================================
-//  script.js  —  RU Digital UFCAT
-//  Versão com integração real à API PHP.
-//  Todas as simulações (setTimeout) foram substituídas por
-//  chamadas fetch() reais.
-// =============================================================
-
 document.addEventListener('DOMContentLoaded', () => {
 
     // ----------------------------------------------------------
     // 0. CONFIGURAÇÃO DA API
     // ----------------------------------------------------------
-    const API_BASE = '/api'; // Ajuste se o backend estiver em outro domínio
+    const API_BASE = '/ru-digital/public/index.php';
 
     /**
      * Wrapper de fetch que:

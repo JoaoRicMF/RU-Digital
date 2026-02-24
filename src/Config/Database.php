@@ -33,9 +33,9 @@ class Database
     {
         $host    = $_ENV['DB_HOST'] ?? 'localhost';
         $port    = $_ENV['DB_PORT'] ?? '3306';
-        $dbname  = $_ENV['DB_NAME'] ?? '';
-        $user    = $_ENV['DB_USER'] ?? '';
-        $pass    = $_ENV['DB_PASS'] ?? '';
+        $dbname  = $_ENV['DB_NAME'] ?? 'ru_digital';
+        $user    = $_ENV['DB_USER'] ?? 'root';
+        $pass    = $_ENV['DB_PASS'] ?? '1504';
 
         $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
 
