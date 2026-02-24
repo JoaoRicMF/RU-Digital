@@ -493,15 +493,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const payload = decodeJwtPayload(token);
         if (!payload || payload.exp < Math.floor(Date.now() / 1000)) {
             localStorage.removeItem('ru_jwt_token');
-            localStorage.removeItem('ru_user_data'); // Limpa dados extra
+            localStorage.removeItem('ru_user_data');
             showLogin();
             return;
         }
 
-        // Administradores são redirecionados para o painel exclusivo
         if (payload.tipo === 'admin') {
-            localStorage.setItem('ru_admin_token', token);
-            window.location.href = 'admin.html'; // <-- O REDIRECIONAMENTO AQUI
+            localStorage.removeItem('ru_jwt_token');
+            localStorage.removeItem('ru_user_data');
+            showLogin();
             return;
         }
 
@@ -563,7 +563,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const token = resp.token ?? resp.data?.token;
-            const saldo = resp.data?.usuario?.saldo ?? resp.data?.saldo ?? 0;
+            const usuario = resp.data?.usuario;
+            const saldo = usuario?.saldo ?? resp.data?.saldo ?? 0;
 
             if (!token) {
                 console.error('[login] Resposta da API não contém token:', resp);
@@ -572,9 +573,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            if (usuario && usuario.tipo === 'admin') {
+                errorEl.textContent = 'Conta de Administrador. Por favor, utilize o "Acesso Administrativo".';
+                errorEl.classList.remove('d-none');
+                return; // Sai da função e não guarda o token!
+            }
+
+            // Se for estudante, guarda o token e prossegue
             localStorage.setItem('ru_jwt_token', token);
-            if (resp.data && resp.data.usuario) {
-                localStorage.setItem('ru_user_data', JSON.stringify(resp.data.usuario));
+            if (usuario) {
+                localStorage.setItem('ru_user_data', JSON.stringify(usuario));
             }
             
             appState.user.balance = saldo;
