@@ -120,6 +120,9 @@ try {
         $method === 'POST' && $uri === '/auth/recuperar'
             => (new AuthController())->recuperar($body),
 
+        $method === 'POST' && $uri === '/auth/redefinir'
+            => (new AuthController())->redefinir($body),
+
         // --- Carteira (protegidas) ---
         $method === 'GET'  && $uri === '/saldo'
             => (new WalletController())->saldo(),
@@ -143,16 +146,6 @@ try {
 
         // --- Rota não encontrada ---
         default => Response::error("Rota não encontrada: {$method} /api{$uri}", 404),
-        
-        // --- Autenticação (pública) ---
-        $method === 'POST' && $uri === '/auth/login'
-            => (new AuthController())->login($body),
-
-        $method === 'POST' && $uri === '/auth/recuperar'
-            => (new AuthController())->recuperar($body),
-
-        $method === 'POST' && $uri === '/auth/redefinir'
-            => (new AuthController())->redefinir($body),
     };
 
 } catch (\RuntimeException $e) {

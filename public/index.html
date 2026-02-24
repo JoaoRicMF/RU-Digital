@@ -36,44 +36,34 @@
     </header>
 
     <main id="main-content" class="d-none">
-
         <section id="view-home" class="view active">
             <div class="card">
-                <h3 class="greeting">Olá, <span id="home-user-name" class="skeleton-text skel-name">João</span></h3>
-    
+                <h3 class="greeting">Olá, <span class="user-first-name skeleton-text skel-name"></span></h3>
                 <div class="balance-container mt-15">
                     <span class="balance-label">Saldo disponível</span>
-                    <span class="balance-amount balance-display skeleton">R$ 0,00</span>
+                    <span class="balance-amount balance-display skeleton"></span>
                 </div>
-
                 <button class="btn btn-primary mt-15 btn-recharge">Fazer Recarga</button>
             </div>
 
             <div class="card mt-15">
                 <h2 class="card-title">Cardápio de Hoje</h2>
-                
                 <div class="menu-highlight mt-15">
                     <i class="fa-solid fa-utensils icon-accent"></i>
-                    
                     <div class="highlight-content">
                         <span class="highlight-title">Almoço</span>
-                        <span class="highlight-desc"><span id="home-menu-text" class="skeleton-text skel-menu">Arroz, feijão e frango</span></span>
+                        <span class="highlight-desc"><span id="home-menu-text" class="skeleton-text skel-menu"></span></span>
                     </div>
                 </div>
-
                 <button class="btn btn-outline mt-15" onclick="navigateTo('view-menu')">Ver cardápio completo</button>
             </div>
 
             <div class="card mt-15">
                 <h2 class="card-title">O que achou do almoço de hoje?</h2>
                 <div class="static-stars mt-10">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
                 </div>
-                <div class="rating-date mt-10">Sua avaliação:5/5 - 02 FEV</div>
+                <div class="rating-date mt-10">Avalie sua refeição!</div>
             </div>
         </section>
 
@@ -102,7 +92,7 @@
         <section id="view-wallet" class="view">
             
             <div class="card">
-                <h3 class="greeting">Olá, João</h3>
+                <h3 class="greeting">Olá, <span class="user-first-name skeleton-text skel-name"></span></h3>
                 
                 <div class="balance-container mt-16">
                     <span class="balance-label">Saldo disponível</span>
@@ -165,8 +155,8 @@
         <section id="view-profile" class="view">
             <div class="profile-header mt-20">
                 <i class="fa-solid fa-circle-user avatar-icon"></i>
-                <h2 class="profile-name mt-10">João Ricardo</h2>
-                <p class="profile-course">Ciência da Computação</p>
+                <h2 class="profile-name mt-10" id="profile-name"></h2>
+                <p class="profile-course" id="profile-course"></p>
             </div>
             
             <div class="card mt-20" style="padding: 10px 20px;">
@@ -213,8 +203,8 @@
         <div class="sidebar-footer">
             <i class="fa-solid fa-circle-user sidebar-user-icon"></i>
             <div class="sidebar-user-info">
-                <span class="sidebar-user-name">João Ricardo</span>
-                <span class="sidebar-user-role">Estudante · CC</span>
+                <span class="sidebar-user-name" id="sidebar-name"></span>
+                <span class="sidebar-user-role" id="sidebar-role"></span>
             </div>
         </div>
     </nav>

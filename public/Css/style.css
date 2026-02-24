@@ -286,31 +286,48 @@ body {
 .static-stars { color: var(--accent-color); font-size: 1.3rem; letter-spacing: 2px; }
 .rating-date { color: #555; font-size: 0.85rem; font-weight: 400; }
 
-/* Cardápio */
-.search-pill { width: 100%; height: 40px; background-color: #dcdcdc; border-radius: 20px; margin-bottom: 20px; }
-.menu-list { list-style: none; }
-.menu-list li { padding: 12px 0; border-bottom: 1px solid #eee; color: var(--text-dark); font-size: 0.95rem; }
-.menu-list li:last-child { border-bottom: none; }
+/* ==========================================================================
+   FORMATAÇÃO DA VISTA: CARDÁPIO
+   ========================================================================== */
+
+/* 1. Contentor Principal do Cardápio (Garante centralização) */
+#view-menu.active {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* O card principal do menu fica com uma largura elegante e centralizado */
+#view-menu .card {
+    width: 100%;
+    max-width: 700px;
+    padding: 24px 32px; /* Mais respiro interno igual ao mockup */
+}
+
+/* 2. Controlos de Almoço / Janta */
 .meal-toggle-container { 
     display: flex; 
     justify-content: center; 
+    width: 100%;
     margin-top: 10px; 
 }
 
 .meal-toggle { 
     display: flex; 
-    background: #dbdbdb; 
+    background: #e4e6e8; 
     border-radius: 30px; 
     padding: 4px; 
     width: 100%; 
     max-width: 320px; 
 }
 
+/* Botões internos da pílula */
 .meal-btn {
-    flex: 1; 
+    flex: 1; /* Garante que os dois botões dividem o espaço 50/50 */
     border: none; 
     background: transparent; 
-    padding: 10px 0; 
+    padding: 10px 0; /* Dá a altura e o preenchimento da pílula */
     border-radius: 26px;
     font-weight: 600; 
     color: #757575; 
@@ -323,29 +340,32 @@ body {
     font-size: 0.95rem;
 }
 
+/* Estado ativo do botão da pílula */
 .meal-btn.active {
     background: var(--primary-color); 
     color: white; 
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
+/* 3. Dias da Semana */
 .week-days-container {
     display: flex; 
     justify-content: space-between; 
-    max-width: 350px; 
-    margin: 20px auto;
-    padding: 0 10px;
+    width: 100%;
+    max-width: 360px; /* Alinhado com o botão de toggle */
+    margin: 24px auto;
+    padding: 0;
 }
 
 .day-btn {
-    width: 42px; 
-    height: 42px; 
+    width: 44px; 
+    height: 44px; 
     border-radius: 50%; 
     border: none; 
-    background: #dbdbdb;
+    background: #e4e6e8;
     color: #555; 
     font-weight: 700; 
-    font-size: 1rem; 
+    font-size: 1.05rem; 
     cursor: pointer; 
     transition: all 0.2s ease;
     display: flex; 
@@ -356,9 +376,38 @@ body {
 .day-btn.active {
     background: var(--primary-color); 
     color: white; 
-    transform: scale(1.1);
-    box-shadow: 0 4px 10px rgba(46, 125, 117, 0.3);
+    transform: scale(1.08); /* Salto ligeiramente mais suave */
+    box-shadow: 0 4px 12px rgba(46, 125, 117, 0.35);
 }
+
+/* 4. Lista de Itens do Cardápio */
+.menu-list { 
+    list-style: none; 
+    padding-left: 0; /* Remove avanço padrão do ul */
+    margin: 0;
+}
+
+.menu-list li { 
+    padding: 16px 0; /* Espaçamento vertical generoso entre pratos */
+    border-bottom: 1px solid #f0f0f0; /* Linha divisória bem suave */
+    color: var(--text-dark); 
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.menu-list li:last-child { 
+    border-bottom: none; 
+    padding-bottom: 24px; /* Dá espaço antes do botão da tabela nutricional */
+}
+
+/* Destaca o nome da categoria (ex: "Principal:") */
+.menu-list li strong {
+    color: #222; /* Preto mais forte para contraste */
+    font-weight: 700;
+    margin-right: 4px;
+}
+
+.search-pill { width: 100%; height: 40px; background-color: #dcdcdc; border-radius: 20px; margin-bottom: 20px; }
 
 /* Extrato */
 .extrato-box { background-color: #E2E2E2; border-radius: 10px; padding: 5px 20px; }
@@ -523,21 +572,18 @@ body {
    ========================================================================== */
 
 /* Skeleton para textos inline (saudação, cardápio) */
-.skeleton-text {
-    background: linear-gradient(90deg, #d2d2d2 25%, #e8e8e8 50%, #d2d2d2 75%);
+.skeleton-text, .skeleton, .skel-box {
+    background: linear-gradient(90deg, #e4e4e4 25%, #f2f2f2 50%, #e4e4e4 75%);
     background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 6px;
+    animation: shimmer 1.8s infinite ease-in-out; /* ease-in-out suaviza as pontas da animação */
     color: transparent !important;
+    border-radius: 6px;
     display: inline-block;
-    min-width: 120px;
-    height: 1em;
-    vertical-align: middle;
 }
 
-.skeleton-text.skel-name   { min-width: 90px; }
-.skeleton-text.skel-menu   { min-width: 180px; }
-.skeleton-text.skel-date   { min-width: 140px; }
+.skeleton-text.skel-name { min-width: 120px; height: 1.2rem; }
+.balance-display.skeleton { min-width: 150px; height: 2.3rem; margin-top: 4px; border-radius: 8px;}
+.skeleton-text.skel-menu { min-width: 200px; height: 1rem; }
 
 
 .skeleton {
@@ -641,178 +687,168 @@ body {
 }
 
 /* ==========================================================================
-   7. RESPONSIVIDADE (TABLET - 768px a 1023px)
+   7. RESPONSIVIDADE — TABLET (768px–1023px)
    ========================================================================== */
 @media (min-width: 768px) and (max-width: 1023px) {
-    /* Expande o container e centraliza */
+
+    /* Container ligeiramente maior, centralizado */
     .app-container {
         max-width: 720px;
         margin: 20px auto;
         border-radius: var(--border-radius);
         overflow: hidden;
+        min-height: calc(100vh - 40px);
     }
 
-    /* Transforma a nav inferior em menu superior */
+    /* Nav inferior vira uma barra horizontal no topo do conteúdo */
     .bottom-nav {
         position: relative;
+        width: 100%;
         height: auto;
         border-top: none;
         border-bottom: 1px solid #eee;
-        padding: 8px 0;
+        padding: 8px 16px;
         justify-content: center;
-        gap: 20px;
+        gap: 4px;
+        order: -1; /* Sobe antes do main-content */
     }
 
     .nav-item {
         width: auto;
         flex-direction: row;
-        padding: 8px 16px;
+        padding: 8px 14px;
+        gap: 6px;
     }
 
     .nav-icon-box {
         margin-bottom: 0;
-        margin-right: 6px;
-        padding: 4px 10px;
+        margin-right: 0;
+        padding: 4px 8px;
     }
 
     #main-content {
         padding-bottom: 24px;
     }
 
-    /* Grid de 2 colunas na Home */
+    /* Home: card de saldo full-width + cardápio e avaliação lado a lado */
     #view-home.active {
-        display: grid;
+        display: grid !important;
         grid-template-columns: 1fr 1fr;
         gap: 16px;
         align-items: start;
     }
     #view-home .card { margin-bottom: 0; }
-    #view-home .card:first-child { grid-column: 1 / -1; }
+    #view-home .card:nth-child(1) { grid-column: 1 / -1; }
+
+    /* Carteira: saldo + extrato em 2 colunas */
+    #view-wallet.active {
+        display: grid !important;
+        grid-template-columns: 1fr 1.4fr;
+        gap: 16px;
+        align-items: start;
+    }
+    #view-wallet .card { margin-bottom: 0; }
 }
 
 /* ==========================================================================
-   7b. RESPONSIVIDADE (DESKTOP - 1024px+) — Sidebar Layout
+   7b. RESPONSIVIDADE — DESKTOP (1024px+)
+   Layout base único: Sidebar fixa + Área de conteúdo centralizada
    ========================================================================== */
 @media (min-width: 1024px) {
 
+    /* ─── FUNDAÇÃO: Layout Sidebar + Main ─────────────────────────────────── */
     body {
-        background-color: #dce0e6;
+        background-color: #d4d8df;
         align-items: flex-start;
     }
 
-    /* App ocupa quase toda a tela em widescreen */
+    /*
+     * .app-container vira o wrapper geral do app.
+     * Usa flex-direction: row para colocar sidebar e main lado a lado.
+     * O flex resolve tudo — sem margin-left manual.
+     */
     .app-container {
-        max-width: 1200px;
+        max-width: 1280px;
         width: calc(100% - 48px);
         margin: 24px auto;
         border-radius: 20px;
         overflow: hidden;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.13);
-        flex-direction: row; /* Sidebar + conteúdo lado a lado */
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.14);
+        flex-direction: row;
         min-height: calc(100vh - 48px);
         height: calc(100vh - 48px);
     }
 
-    /* Show sidebar decorative elements on desktop */
-    .sidebar-logo {
-        display: flex;
+    /* Header mobile some no desktop — sidebar assume */
+    .app-header {
+        display: none !important;
     }
 
-    .sidebar-footer {
-        display: flex;
-    }
-
-    /* ---- SIDEBAR ---- */
+    /* ─── SIDEBAR ──────────────────────────────────────────────────────────── */
     .bottom-nav {
+        /* Dimensões fixas — flex-shrink: 0 impede encolhimento */
+        width: 260px;
+        min-width: 260px;
+        flex-shrink: 0;
+
+        /* Layout interno */
         position: relative;
-        width: 240px;
-        min-width: 240px;
         height: 100%;
         flex-direction: column;
         justify-content: flex-start;
         align-items: stretch;
+
+        /* Visual */
         border-top: none;
-        border-right: 1px solid #eee;
+        border-right: 1px solid #e8eaed;
+        background: var(--card-bg);
+        box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
         padding: 0;
         gap: 0;
-        background: var(--card-bg);
-        box-shadow: 2px 0 8px rgba(0,0,0,0.04);
         overflow-y: auto;
     }
 
-    /* Logo no topo da sidebar */
+    /* Logo header da sidebar */
     .sidebar-logo {
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 24px 20px 18px;
-        border-bottom: 1px solid #f0f0f0;
+        padding: 28px 20px 20px;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
         background: linear-gradient(160deg, var(--primary-color) 0%, #3a9e95 100%);
         flex-shrink: 0;
     }
 
     .sidebar-logo-img {
-        width: 56px;
-        height: 56px;
+        width: 58px;
+        height: 58px;
         object-fit: contain;
         border-radius: 14px;
         background: white;
-        padding: 6px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+        padding: 7px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         margin-bottom: 10px;
     }
 
     .sidebar-logo-title {
-        font-size: 1.1rem;
+        font-size: 1.05rem;
         font-weight: 700;
         color: white;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.4px;
     }
 
-    /* Footer da sidebar com info do usuário */
-    .sidebar-footer {
-        margin-top: auto;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 16px 20px;
-        border-top: 1px solid #f0f0f0;
-        background: #fafafa;
-    }
-
-    .sidebar-user-icon {
-        font-size: 2.2rem;
-        color: var(--primary-color);
-        flex-shrink: 0;
-    }
-
-    .sidebar-user-info {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .sidebar-user-name {
-        font-size: 0.9rem;
-        font-weight: 700;
-        color: var(--text-dark);
-    }
-
-    .sidebar-user-role {
-        font-size: 0.75rem;
-        color: var(--text-light);
-    }
-
+    /* Itens de navegação */
     .nav-item {
         width: 100%;
         flex-direction: row;
         align-items: center;
         justify-content: flex-start;
-        padding: 14px 20px;
+        padding: 13px 20px;
         border-radius: 0;
-        font-size: 0.95rem;
+        font-size: 0.92rem;
         gap: 0;
         border-left: 3px solid transparent;
-        transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        transition: background-color 0.18s, border-color 0.18s, color 0.18s;
     }
 
     .nav-item:hover {
@@ -823,7 +859,8 @@ body {
     .nav-icon-box {
         width: 36px;
         min-width: 36px;
-        padding: 6px 0;
+        height: 36px;
+        padding: 0;
         margin-bottom: 0;
         margin-right: 12px;
         border-radius: 10px;
@@ -831,133 +868,244 @@ body {
         align-items: center;
         justify-content: center;
         background: transparent;
-        transition: background-color 0.2s;
+        transition: background-color 0.18s;
     }
 
-    .nav-item i {
-        font-size: 1.15rem;
-        margin: 0;
-    }
+    .nav-item i { font-size: 1.1rem; margin: 0; }
 
     .nav-item.active {
         border-left-color: var(--primary-color);
         background-color: rgba(46, 125, 117, 0.08);
+        color: var(--primary-color);
     }
 
     .nav-item.active .nav-icon-box {
-        background-color: rgba(46, 125, 117, 0.15);
+        background-color: rgba(46, 125, 117, 0.14);
     }
 
-    /* ---- HEADER — esconde no desktop (sidebar substitui) ---- */
-    .app-header {
-        display: none !important;
+    /* Footer da sidebar: info do usuário logado */
+    .sidebar-footer {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 20px;
+        border-top: 1px solid #f0f0f0;
+        background: #fafafa;
+        flex-shrink: 0;
     }
 
-    /* ---- ÁREA DE CONTEÚDO ---- */
+    .sidebar-user-icon { font-size: 2rem; color: var(--primary-color); flex-shrink: 0; }
+    .sidebar-user-info { display: flex; flex-direction: column; overflow: hidden; }
+    .sidebar-user-name { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-user-role { font-size: 0.74rem; color: var(--text-light); }
+
+    /* ─── ÁREA DE CONTEÚDO (page-container pattern) ────────────────────────
+     *
+     * #main-content = o "main" do layout. flex: 1 ocupa o espaço restante.
+     * min-width: 0 é ESSENCIAL para evitar overflow quando o conteúdo é grande.
+     * display: flex + align-items: flex-start cria o page-container centralizado.
+     *
+     ───────────────────────────────────────────────────────────────────────── */
     #main-content {
         flex: 1;
-        padding: 28px 32px;
-        padding-bottom: 28px;
-        overflow-y: auto;
+        min-width: 0;            /* Evita overflow com flex + conteúdo grande */
         height: 100%;
+        overflow-y: auto;
+        padding: 0;              /* Padding vai ficar no page-container */
+        display: flex;
+        justify-content: center; /* Centraliza o page-container horizontalmente */
+        align-items: flex-start;
+        padding-bottom: 0;
     }
 
-    /* Grid de 2 colunas na Home */
+    /*
+     * .view.active age como o "page-container":
+     * - max-width: 1100px garante que o conteúdo nunca fica espalhado demais
+     * - padding: 40px 48px dá o respiro visual correto
+     * - width: 100% + margin auto = centralização automática
+     */
+    .view.active {
+        width: 100%;
+        max-width: 1100px;
+        padding: 40px 48px;
+        align-self: flex-start;
+    }
+
+    /* ─── TIPOGRAFIA DESKTOP ──────────────────────────────────────────────── */
+    .greeting          { font-size: 1.45rem; }
+    .card-title        { font-size: 1.15rem; }
+    .card-title-lg     { font-size: 1.3rem; }
+    .section-title     { font-size: 1.15rem; }
+    .balance-label     { font-size: 0.95rem; }
+    .balance-amount    { font-size: 2.6rem; }
+
+    /* ─── CARDS PADRONIZADOS ──────────────────────────────────────────────── */
+    /*
+     * Todos os cards desktop recebem padding maior e altura mínima uniforme.
+     * margin-bottom: 0 pois o espaçamento fica por conta do gap do grid.
+     */
+    .card {
+        padding: 24px 28px;
+        border-radius: 14px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    }
+
+    /* ─── BOTÕES NO DESKTOP ───────────────────────────────────────────────── */
+    /* No desktop botões não devem ser full-width absurdos */
+    .btn {
+        max-width: 280px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       GRIDS POR TELA
+       Cada tela tem seu grid específico — não stacks soltas.
+       ════════════════════════════════════════════════════════════════════════ */
+
+    /* ─── HOME ───────────────────────────────────────────────────────────────
+     * Linha 1: Card de saldo (full width)
+     * Linha 2: Card Cardápio (2/3) + Card Avaliação (1/3)
+     ───────────────────────────────────────────────────────────────────────── */
     #view-home.active {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        align-items: start;
+        display: grid !important;
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: auto auto;
+        gap: 24px;
+        align-items: stretch;
     }
-    #view-home .card { margin-bottom: 0; }
-    /* Card saldo: linha inteira no topo */
-    #view-home .card:nth-child(1) { grid-column: 1 / -1; }
-    /* Cards Cardápio e Avaliação: lado a lado */
-    #view-home .card:nth-child(2) { grid-column: 1 / 2; }
-    #view-home .card:nth-child(3) { grid-column: 2 / 3; }
 
-    /* Cardápio: 1 coluna (conteúdo único) */
-    #view-menu.active {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 20px;
-        align-items: start;
-        max-width: 640px;
+    #view-home .card {
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
     }
-    #view-menu .card { margin-bottom: 0; }
 
-    /* Avaliação em 2 colunas: header topo inteiro, critérios e comentário lado a lado */
-    #view-rating.active {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        align-items: start;
+    /* Saldo: linha inteira */
+    #view-home .card:nth-child(1) {
+        grid-column: 1 / -1;
     }
-    #view-rating .card { margin-bottom: 0; }
-    /* Card saudação ocupa linha inteira */
-    #view-rating .card:nth-child(1) { grid-column: 1 / -1; }
-    /* Critérios e comentários lado a lado */
-    #view-rating .card:nth-child(2) { grid-column: 1 / 2; }
-    #view-rating .card:nth-child(3) { grid-column: 2 / 3; }
 
-    /* Wallet em 2 colunas */
+    /* Cardápio: coluna larga */
+    #view-home .card:nth-child(2) {
+        grid-column: 1 / 2;
+    }
+
+    /* Avaliação rápida: coluna estreita */
+    #view-home .card:nth-child(3) {
+        grid-column: 2 / 3;
+    }
+
+    /* Botão "Ver cardápio completo" cola no fundo do card */
+    #view-home .card:nth-child(2) .btn {
+        margin-top: auto;
+    }
+
+    /* ─── CARTEIRA ────────────────────────────────────────────────────────────
+     * Saldo (esquerda, 1 coluna) + Extrato (direita, 1.6 colunas)
+     * align-items: start → cards não esticam, ficam na altura do conteúdo
+     ───────────────────────────────────────────────────────────────────────── */
     #view-wallet.active {
-        display: grid;
-        grid-template-columns: 1fr 1.5fr;
-        gap: 20px;
+        display: grid !important;
+        grid-template-columns: 1fr 1.6fr;
+        gap: 24px;
         align-items: start;
     }
+
     #view-wallet .card { margin-bottom: 0; }
 
-    /* Perfil centralizado */
-    #view-profile.active {
-        max-width: 480px;
-        margin: 0 auto;
+    /* ─── CARDÁPIO ────────────────────────────────────────────────────────────
+     * Não é um dashboard — precisa de foco.
+     * Coluna única centralizada com max-width para legibilidade.
+     ───────────────────────────────────────────────────────────────────────── */
+    #view-menu.active {
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        max-width: 740px !important; /* Override do .view.active max-width */
     }
 
-    /* ---- GLASSMORPHISM NOS MODAIS ---- */
+    #view-menu .card {
+        width: 100%;
+    }
+
+    /* ─── AVALIAÇÃO ───────────────────────────────────────────────────────────
+     * Linha 1: Cabeçalho (full width)
+     * Linha 2: Critérios de nota (esquerda) + Comentário (direita)
+     ───────────────────────────────────────────────────────────────────────── */
+    #view-rating.active {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        align-items: start;
+    }
+
+    #view-rating .card { margin-bottom: 0; }
+
+    /* Cabeçalho: linha inteira */
+    #view-rating .card:nth-child(1) { grid-column: 1 / -1; }
+    /* Critérios: coluna esquerda */
+    #view-rating .card:nth-child(2) { grid-column: 1 / 2; }
+    /* Comentário + botão: coluna direita */
+    #view-rating .card:nth-child(3) { grid-column: 2 / 3; }
+
+    /* Área de comentário maior no desktop */
+    .comment-box { height: 120px; }
+
+    /* ─── PERFIL ──────────────────────────────────────────────────────────────
+     * Coluna única, max-width 580px, centralizado.
+     * Sem espaço vazio excessivo — margin-top controlado.
+     ───────────────────────────────────────────────────────────────────────── */
+    #view-profile.active {
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        max-width: 580px !important;
+    }
+
+    #view-profile .card,
+    #view-profile > * {
+        width: 100%;
+    }
+
+    #view-profile .profile-header {
+        margin-top: 8px; /* Reduz espaço em branco excessivo no topo */
+    }
+
+    #view-profile .btn-danger-outline {
+        max-width: 100%;
+        margin-top: 8px; /* Espaçamento controlado, sem empurrar pra baixo */
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       MODAIS — Glassmorphism no desktop
+       ════════════════════════════════════════════════════════════════════════ */
     .modal-overlay {
-        background: rgba(15, 40, 38, 0.45);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        transition: background 0.3s ease;
+        background: rgba(10, 35, 33, 0.45);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
 
     .modal-content {
-        max-width: 420px;
-        border-radius: 24px;
+        max-width: 400px;
         padding: 28px;
-        background: rgba(255, 255, 255, 0.82);
-        backdrop-filter: blur(24px) saturate(1.6);
-        -webkit-backdrop-filter: blur(24px) saturate(1.6);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(20px) saturate(1.3);
+        -webkit-backdrop-filter: blur(20px) saturate(1.3);
         border: 1px solid rgba(255, 255, 255, 0.65);
-        box-shadow:
-            0 8px 32px rgba(0, 0, 0, 0.18),
-            0 1px 0 rgba(255,255,255,0.9) inset;
-        animation: modalPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    @keyframes modalPop {
-        from { opacity: 0; transform: scale(0.93) translateY(12px); }
-        to   { opacity: 1; transform: scale(1)    translateY(0); }
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16);
     }
 
     .modal-header {
-        border-bottom-color: rgba(0,0,0,0.08);
+        border-bottom-color: rgba(0, 0, 0, 0.07);
     }
 
     .form-input {
-        background: rgba(240, 244, 247, 0.8);
-        border: 1px solid rgba(46, 125, 117, 0.2);
-        border-radius: 10px;
-        padding: 13px 15px;
-        font-size: 1rem;
-        width: 100%;
-        color: var(--text-dark);
-        transition: border-color 0.2s, box-shadow 0.2s;
+        background: rgba(242, 244, 247, 0.85);
+        border: 1px solid rgba(46, 125, 117, 0.22);
     }
 
-    /* Login ocupa tela cheia mesmo no desktop */
+    /* Login: sem border-radius extra */
     #view-login.login-container {
         border-radius: 0;
     }

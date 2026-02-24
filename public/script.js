@@ -490,10 +490,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const token = localStorage.getItem('ru_jwt_token');
         if (!token) { showLogin(); return; }
 
-        // Verifica se o token ainda não expirou (client-side, sem requisição)
         const payload = decodeJwtPayload(token);
         if (!payload || payload.exp < Math.floor(Date.now() / 1000)) {
             localStorage.removeItem('ru_jwt_token');
+            localStorage.removeItem('ru_user_data'); // Limpa dados extra
             showLogin();
             return;
         }
@@ -502,12 +502,28 @@ document.addEventListener('DOMContentLoaded', () => {
         showApp();
         window.navigateTo('view-home');
 
-        // Preenche nome do usuário
-        const nameEl = document.getElementById('home-user-name');
-        if (nameEl) {
-            nameEl.classList.remove('skeleton-text', 'skel-name');
-            nameEl.textContent = payload.nome;
-        }
+        // --- NOVA LÓGICA DE PREENCHIMENTO DINÂMICO ---
+        const userData = JSON.parse(localStorage.getItem('ru_user_data') || '{}');
+        const primeiroNome = payload.nome ? payload.nome.split(' ')[0] : 'Estudante';
+        const cursoUtilizador = userData.curso || 'UFCAT';
+
+        // 1. Atualiza todas as saudações (Home, Carteira, Avaliação) e remove skeletons
+        document.querySelectorAll('.user-first-name, #home-user-name').forEach(el => {
+            el.classList.remove('skeleton-text', 'skel-name');
+            el.textContent = primeiroNome;
+        });
+
+        // 2. Atualiza Sidebar no Desktop
+        const sidebarName = document.getElementById('sidebar-name');
+        const sidebarRole = document.getElementById('sidebar-role');
+        if (sidebarName) sidebarName.textContent = payload.nome;
+        if (sidebarRole) sidebarRole.textContent = cursoUtilizador;
+
+        // 3. Atualiza Ecrã de Perfil
+        const profileName = document.getElementById('profile-name');
+        const profileCourse = document.getElementById('profile-course');
+        if (profileName) profileName.textContent = payload.nome;
+        if (profileCourse) profileCourse.textContent = cursoUtilizador;
 
         // Carrega dados reais com skeleton
         renderTransactionsSkeleton();
@@ -550,6 +566,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             localStorage.setItem('ru_jwt_token', token);
+            if (resp.data && resp.data.usuario) {
+                localStorage.setItem('ru_user_data', JSON.stringify(resp.data.usuario));
+            }
+            
             appState.user.balance = saldo;
             checkAuth();
 
@@ -568,10 +588,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // LOGOUT
     document.getElementById('btn-logout')?.addEventListener('click', () => {
         localStorage.removeItem('ru_jwt_token');
+        localStorage.removeItem('ru_user_data');
         document.getElementById('login-email').value = '';
         document.getElementById('login-password').value = '';
         appState.user = { name: '', balance: 0 };
         appState.transactions = [];
+
+        // Repõe skeletons para o próximo utilizador não ver dados antigos num flash
+        document.querySelectorAll('.user-first-name, #home-user-name').forEach(el => {
+            el.classList.add('skeleton-text', 'skel-name');
+            el.textContent = '';
+        });
+        document.querySelectorAll('.balance-display').forEach(el => {
+            el.classList.add('skeleton');
+            el.textContent = '';
+        });
+
         showLogin();
     });
 
