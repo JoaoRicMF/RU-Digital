@@ -30,7 +30,8 @@ use Dotenv\Dotenv;
 // ------------------------------------------------------------------
 // 1. CARREGA VARIÁVEIS DE AMBIENTE (.env)
 // ------------------------------------------------------------------
-$dotenv = Dotenv::createImmutable(__DIR__ . '/..');
+$envPath = realpath(__DIR__ . DIRECTORY_SEPARATOR . '..') ?: dirname(__DIR__);
+$dotenv = Dotenv::createImmutable($envPath);
 $dotenv->load();
 
 // Valida variáveis obrigatórias
