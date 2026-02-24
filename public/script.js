@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------
     // 0. CONFIGURAÇÃO DA API
     // ----------------------------------------------------------
-    const API_BASE = '/ru-digital/public/index.php';
+    const API_BASE = 'http://localhost/RU-Digital/public/api';
 
     /**
      * Wrapper de fetch que:

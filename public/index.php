@@ -57,10 +57,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // 4. EXTRAI MÉTODO E CAMINHO DA REQUISIÇÃO
 // ------------------------------------------------------------------
 $method = $_SERVER['REQUEST_METHOD'];
-
-// Remove a base path e query string; normaliza barras
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$uri = rtrim(str_replace('/api', '', $uri), '/') ?: '/';
+
+// Descobre automaticamente a pasta base do XAMPP (ex: /RU-Digital/public)
+$basePath = dirname($_SERVER['SCRIPT_NAME']);
+
+// Remove a pasta base da URL
+if (strpos($uri, $basePath) === 0) {
+    $uri = substr($uri, strlen($basePath));
+}
+
+// Remove o /api do começo do caminho, se houver
+if (strpos($uri, '/api') === 0) {
+    $uri = substr($uri, 4);
+}
+
+// Normaliza a URI para o formato final
+$uri = rtrim($uri, '/') ?: '/';
 
 // ------------------------------------------------------------------
 // 5. LÊ O BODY JSON (para POST/PUT)

@@ -1,9 +1,4 @@
-# =============================================================
-#  public/.htaccess
-#  Redireciona todas as requisições para o index.php (Front Controller)
-#  e aplica cabeçalhos de segurança.
-# =============================================================
-
+DirectoryIndex index.html index.php
 Options -Indexes
 
 # Força HTTPS em produção

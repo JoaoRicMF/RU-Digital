@@ -54,6 +54,10 @@ class AuthController
         $stmt->execute([':email' => $email]);
         $user = $stmt->fetch();
 
+        if (!$user) {
+    error_log("Usuário não encontrado no banco ou inativo.");
+}
+
         // 4. Verifica senha com password_verify (bcrypt)
         //    Comparamos hash mesmo que o usuário não exista para
         //    evitar timing attacks (enumeração de e-mails)
