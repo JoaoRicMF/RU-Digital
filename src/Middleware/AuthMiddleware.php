@@ -28,21 +28,28 @@ class AuthMiddleware
     {
         $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
 
-        // Suporte a CGI/FastCGI que pode renomear o header
         if (empty($authHeader)) {
             $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
         }
 
-        if (empty($authHeader) || !str_starts_with($authHeader, 'Bearer ')) {
+        // FORÇA a captura do cabeçalho caso o servidor PHP local o tenha ocultado
+        if (empty($authHeader) && function_exists('getallheaders')) {
+            $headers = array_change_key_case(getallheaders(), CASE_LOWER);
+            if (isset($headers['authorization'])) {
+                $authHeader = $headers['authorization'];
+            }
+        }
+
+        // Valida se o cabeçalho existe e começa com "Bearer " (ignorando maiúsculas/minúsculas)
+        if (empty($authHeader) || !preg_match('/^Bearer\s+(.*)$/i', $authHeader, $matches)) {
             Response::error('Token de acesso não fornecido.', 401);
         }
 
-        $token  = substr($authHeader, 7); // Remove 'Bearer '
+        $token  = $matches[1]; // Pega apenas a chave, sem a palavra Bearer
         $secret = $_ENV['JWT_SECRET'] ?? '';
 
         try {
-            $payload = JWT::decode($token, new Key($secret, 'HS256'));
-            return $payload;
+            return JWT::decode($token, new Key($secret, 'HS256'));
 
         } catch (ExpiredException) {
             Response::error('Sessão expirada. Faça login novamente.', 401);
