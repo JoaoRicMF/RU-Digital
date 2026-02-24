@@ -143,11 +143,21 @@ class AuthController
                  VALUES (?, ?, ?)'
             )->execute([$user['id'], $tokenHash, $expira]);
 
-            // TODO: enviar e-mail com PHPMailer
-            // $link = $_ENV['APP_URL'] . '/reset?token=' . $tokenRaw;
-            // Mailer::send($email, 'Recuperação de Acesso', "Acesse: $link");
+            $link = $_ENV['APP_URL'] . '/reset.html?token=' . $tokenRaw;
+            
+            $assunto = 'Recuperação de Acesso - RU Digital';
+            $mensagem = "Olá!\n\nFoi solicitada a recuperação de senha para a sua conta.\n";
+            $mensagem .= "Acesse o link abaixo para criar uma nova senha:\n{$link}\n\n";
+            $mensagem .= "Se não solicitou esta alteração, ignore este e-mail.";
+            
+            $headers = "From: noreply@ufcat.edu.br\r\n" .
+                       "Reply-To: suporte-ru@ufcat.edu.br\r\n" .
+                       "X-Mailer: PHP/" . phpversion();
 
-            error_log("[RECUPERAR] Token gerado para {$email}: {$tokenRaw}");
+            // Descomente em ambiente de produção com servidor SMTP configurado
+            // mail($email, $assunto, $mensagem, $headers);
+            
+            error_log("[RECUPERAR] Link gerado para {$email}: {$link}");
         }
 
         // Sempre retorna a mesma mensagem (segurança)
@@ -209,5 +219,61 @@ class AuthController
     {
         $this->db->prepare('DELETE FROM login_attempts WHERE ip = ?')
                  ->execute([$this->getIp()]);
+    }
+    // ---------------------------------------------------------
+    //  POST /api/auth/redefinir
+    //  Body: { "token": "...", "nova_senha": "..." }
+    // ---------------------------------------------------------
+    public function redefinir(array $body): never
+    {
+        $tokenRaw  = $body['token'] ?? '';
+        $novaSenha = $body['nova_senha'] ?? '';
+
+        if (empty($tokenRaw) || empty($novaSenha)) {
+            Response::error('Token e nova senha são obrigatórios.', 422);
+        }
+
+        if (strlen($novaSenha) < 6) {
+            Response::error('A nova senha deve ter pelo menos 6 caracteres.', 422);
+        }
+
+        // Aplica o hash SHA-256 no token recebido para comparar com a base de dados
+        $tokenHash = hash('sha256', $tokenRaw);
+
+        // Verifica se o token existe, não foi usado e ainda está dentro da validade
+        $stmt = $this->db->prepare(
+            'SELECT usuario_id FROM tokens_recuperacao 
+             WHERE token = ? AND usado = 0 AND expira_em > NOW() 
+             LIMIT 1'
+        );
+        $stmt->execute([$tokenHash]);
+        $registro = $stmt->fetch();
+
+        if (!$registro) {
+            Response::error('Token inválido ou expirado.', 400);
+        }
+
+        $usuarioId = $registro['usuario_id'];
+        $novoHash  = password_hash($novaSenha, PASSWORD_BCRYPT, ['cost' => 12]);
+
+        // Inicia transação para garantir que ambas as atualizações ocorram
+        $this->db->beginTransaction();
+
+        try {
+            // Atualiza a senha do utilizador
+            $this->db->prepare('UPDATE usuarios SET senha_hash = ? WHERE id = ?')
+                     ->execute([$novoHash, $usuarioId]);
+
+            // Invalida o token para que não possa ser usado novamente
+            $this->db->prepare('UPDATE tokens_recuperacao SET usado = 1 WHERE token = ?')
+                     ->execute([$tokenHash]);
+
+            $this->db->commit();
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            Response::error('Erro ao redefinir a senha.', 500);
+        }
+
+        Response::success(['mensagem' => 'Senha redefinida com sucesso. Já pode fazer o login.']);
     }
 }

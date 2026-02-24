@@ -45,6 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
         transactions: [],
         jwtPayload:   null, // payload decodificado do JWT
         cardapioId:   null, // ID real do cardápio do dia, preenchido por refreshMenu()
+        menuData:     [],       // Guarda o almoço e janta da data selecionada
+        selectedDate: new Date().toISOString().split('T')[0], // Hoje (YYYY-MM-DD)
+        selectedMeal: 'almoco'  // Padrão é almoço
     };
 
     const currencyFormatter = new Intl.NumberFormat('pt-BR', {
@@ -122,30 +125,139 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /** Busca e exibe o cardápio de hoje */
-    async function refreshMenu() {
+    async function fetchMenuForHome() {
+        const menuEl = document.getElementById('home-menu-text');
         try {
-            const resp = await apiFetch('/cardapio');
-            const cardapios = resp.data.cardapios;
-            const almoco = cardapios.find(c => c.refeicao === 'almoco');
+            const today = new Date().toISOString().split('T')[0];
+            const resp = await apiFetch(`/cardapio?data=${today}`);
+            const almoco = resp.data.cardapios.find(c => c.refeicao === 'almoco');
 
-            if (almoco) {
-                // Guarda o ID real do cardápio para uso no envio de avaliações
-                appState.cardapioId = almoco.id ?? null;
-
+            if (almoco && menuEl) {
+                appState.cardapioId = almoco.id ?? null; // ID para as avaliações
                 const principal = almoco.itens.find(i => i.categoria === 'principal');
-                const guarnição = almoco.itens.find(i => i.categoria === 'guarnicao');
-                const menuEl = document.getElementById('home-menu-text');
-                if (menuEl && principal) {
-                    menuEl.classList.remove('skeleton-text', 'skel-menu');
-                    menuEl.textContent = [principal?.descricao, guarnição?.descricao]
-                        .filter(Boolean).join(', ');
-                }
+                const guarnicao = almoco.itens.find(i => i.categoria === 'guarnicao');
+                
+                menuEl.classList.remove('skeleton-text', 'skel-menu');
+                menuEl.textContent = [principal?.descricao, guarnicao?.descricao].filter(Boolean).join(', ');
+            } else if (menuEl) {
+                menuEl.classList.remove('skeleton-text', 'skel-menu');
+                menuEl.textContent = 'Cardápio não disponível hoje.';
             }
         } catch (err) {
-            console.error('[refreshMenu]', err);
+            if (menuEl) menuEl.textContent = 'Erro ao carregar';
         }
     }
 
+    /** Inicializa a interface de dias da semana e os cliques */
+    function initMenuUI() {
+        const weekContainer = document.getElementById('week-days-container');
+        if (!weekContainer) return;
+        
+        const diasSemana = ['S', 'T', 'Q', 'Q', 'S', 'S'];
+        const nomesDias = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        
+        // Lógica para encontrar a Segunda-feira da semana atual
+        const today = new Date();
+        const dayOfWeek = today.getDay(); // 0 é Domingo, 1 a 6 são Seg a Sáb
+        const diffToMonday = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+        const monday = new Date(today.setDate(diffToMonday));
+
+        weekContainer.innerHTML = ''; // Limpa antes de preencher
+        
+        // Gera os 6 botões (Seg a Sáb)
+        for (let i = 0; i < 6; i++) {
+            const date = new Date(monday);
+            date.setDate(monday.getDate() + i);
+            const dateString = date.toISOString().split('T')[0];
+            
+            const btn = document.createElement('button');
+            // Se a data gerada for igual a selecionada no appState, fica ativa
+            btn.className = `day-btn ${dateString === appState.selectedDate ? 'active' : ''}`;
+            btn.textContent = diasSemana[i];
+            
+            btn.addEventListener('click', () => {
+                // Remove active de todos e bota no clicado
+                document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Atualiza o estado e a interface
+                appState.selectedDate = dateString;
+                document.getElementById('full-menu-title').textContent = `Cardápio de ${nomesDias[i]}-Feira`;
+                
+                // Busca os dados da nova data na API
+                fetchMenuForSelectedDate();
+            });
+            
+            weekContainer.appendChild(btn);
+
+            // Ajusta o título inicial se hoje for de Seg a Sáb
+            if (dateString === appState.selectedDate) {
+                document.getElementById('full-menu-title').textContent = `Cardápio de ${nomesDias[i]}-Feira`;
+            }
+        }
+
+        // Eventos do Switch Almoço/Janta
+        document.querySelectorAll('.meal-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.meal-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                appState.selectedMeal = btn.dataset.meal; // 'almoco' ou 'jantar'
+                renderMenuDetails(); // Renderiza usando os dados já baixados
+            });
+        });
+
+        // Carrega a aba de cardápio pela primeira vez
+        fetchMenuForSelectedDate();
+    }
+
+    /** Busca o cardápio do dia selecionado e renderiza */
+    async function fetchMenuForSelectedDate() {
+        const fullMenuList = document.getElementById('full-menu-list');
+        if (fullMenuList) fullMenuList.innerHTML = '<div class="skeleton-text skel-menu">Carregando cardápio...</div>';
+
+        try {
+            // Usa o parâmetro ?data= para pegar o dia exato
+            const resp = await apiFetch(`/cardapio?data=${appState.selectedDate}`);
+            appState.menuData = resp.data.cardapios; // Guarda almoço e janta no estado local
+            renderMenuDetails();
+        } catch (err) {
+            console.error('[fetchMenuForSelectedDate]', err);
+            if (fullMenuList) fullMenuList.innerHTML = '<li>Erro ao carregar o cardápio.</li>';
+        }
+    }
+
+    /** Exibe os itens com base na refeição escolhida no Switch */
+    function renderMenuDetails() {
+        const fullMenuList = document.getElementById('full-menu-list');
+        if (!fullMenuList) return;
+
+        // Procura nos dados da API se existe a refeição que o utilizador marcou (almoço ou janta)
+        const refeicao = appState.menuData.find(c => c.refeicao === appState.selectedMeal);
+
+        if (refeicao) {
+            fullMenuList.innerHTML = '';
+            const nomesCategorias = {
+                'principal': 'Principal',
+                'guarnicao': 'Guarnição',
+                'arroz_feijao': 'Arroz / Feijão',
+                'salada': 'Salada',
+                'sobremesa': 'Sobremesa',
+                'suco': 'Suco'
+            };
+
+            refeicao.itens.forEach(item => {
+                const li = document.createElement('li');
+                const catFormatada = nomesCategorias[item.categoria] || item.categoria;
+                const imgTag = item.imagem_url ? `<br><img src="${item.imagem_url}" style="max-width: 100px; border-radius: 8px; margin-top: 5px;">` : '';
+                
+                li.innerHTML = `<strong>${catFormatada}:</strong> ${item.descricao} ${imgTag}`;
+                fullMenuList.appendChild(li);
+            });
+        } else {
+            const nomeRefeicao = appState.selectedMeal === 'almoco' ? 'almoço' : 'jantar';
+            fullMenuList.innerHTML = `<li style="text-align:center; padding: 20px 0; color: #888;">Nenhum ${nomeRefeicao} planeado para este dia.</li>`;
+        }
+    }
 
     // ----------------------------------------------------------
     // 3. NAVEGAÇÃO
@@ -400,9 +512,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Carrega dados reais com skeleton
         renderTransactionsSkeleton();
         refreshWalletData();
-        refreshMenu();
+        fetchMenuForHome();
+        initMenuUI();
     }
 
+    // LOGIN
     // LOGIN
     document.getElementById('btn-login')?.addEventListener('click', async () => {
         const email = document.getElementById('login-email').value.trim();
@@ -411,6 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const btnLogin = document.getElementById('btn-login');
 
         if (!email || !senha) {
+            errorEl.textContent = 'Preencha o e-mail e a senha.'; // Adicionado feedback claro
             errorEl.classList.remove('d-none');
             return;
         }
@@ -424,14 +539,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ email, senha }),
             });
 
-            // O token pode estar em resp.token ou resp.data.token dependendo
-            // de como o AuthController serializa a resposta.
-            // Testa os dois caminhos para ser robusto.
             const token = resp.token ?? resp.data?.token;
             const saldo = resp.data?.usuario?.saldo ?? resp.data?.saldo ?? 0;
 
             if (!token) {
                 console.error('[login] Resposta da API não contém token:', resp);
+                errorEl.textContent = 'Erro interno. Token não recebido.';
                 errorEl.classList.remove('d-none');
                 return;
             }
@@ -442,7 +555,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (err) {
             console.error('[login] Erro:', err.message);
+            
+            // A MAGIA ACONTECE AQUI: Em vez de texto estático, injetamos a mensagem da API
+            errorEl.textContent = err.message || 'Erro ao conectar com o servidor.';
             errorEl.classList.remove('d-none');
+            
         } finally {
             btnLogin.classList.remove('is-loading');
         }

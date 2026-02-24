@@ -291,6 +291,74 @@ body {
 .menu-list { list-style: none; }
 .menu-list li { padding: 12px 0; border-bottom: 1px solid #eee; color: var(--text-dark); font-size: 0.95rem; }
 .menu-list li:last-child { border-bottom: none; }
+.meal-toggle-container { 
+    display: flex; 
+    justify-content: center; 
+    margin-top: 10px; 
+}
+
+.meal-toggle { 
+    display: flex; 
+    background: #dbdbdb; 
+    border-radius: 30px; 
+    padding: 4px; 
+    width: 100%; 
+    max-width: 320px; 
+}
+
+.meal-btn {
+    flex: 1; 
+    border: none; 
+    background: transparent; 
+    padding: 10px 0; 
+    border-radius: 26px;
+    font-weight: 600; 
+    color: #757575; 
+    cursor: pointer; 
+    transition: all 0.3s ease;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 8px;
+    font-size: 0.95rem;
+}
+
+.meal-btn.active {
+    background: var(--primary-color); 
+    color: white; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.week-days-container {
+    display: flex; 
+    justify-content: space-between; 
+    max-width: 350px; 
+    margin: 20px auto;
+    padding: 0 10px;
+}
+
+.day-btn {
+    width: 42px; 
+    height: 42px; 
+    border-radius: 50%; 
+    border: none; 
+    background: #dbdbdb;
+    color: #555; 
+    font-weight: 700; 
+    font-size: 1rem; 
+    cursor: pointer; 
+    transition: all 0.2s ease;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+}
+
+.day-btn.active {
+    background: var(--primary-color); 
+    color: white; 
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(46, 125, 117, 0.3);
+}
 
 /* Extrato */
 .extrato-box { background-color: #E2E2E2; border-radius: 10px; padding: 5px 20px; }

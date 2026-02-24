@@ -43,7 +43,7 @@ class MenuController
         // Busca todos os cardápios do dia com seus itens
         $stmt = $this->db->prepare(
             'SELECT c.id, c.refeicao,
-                    i.categoria, i.descricao, i.calorias, i.proteinas_g, i.carboidratos_g
+                    i.categoria, i.descricao, i.imagem_url, i.calorias, i.proteinas_g, i.carboidratos_g
              FROM   cardapio c
              JOIN   itens_cardapio i ON i.cardapio_id = c.id
              WHERE  c.data_ref = ? AND c.ativo = 1
@@ -66,6 +66,7 @@ class MenuController
             $cardapios[$ref]['itens'][] = [
                 'categoria'      => $row['categoria'],
                 'descricao'      => $row['descricao'],
+                'imagem_url'     => $row['imagem_url'], // URL da imagem exposta ao frontend
                 'calorias'       => $row['calorias'],
                 'proteinas_g'    => $row['proteinas_g']    ? (float) $row['proteinas_g']    : null,
                 'carboidratos_g' => $row['carboidratos_g'] ? (float) $row['carboidratos_g'] : null,
