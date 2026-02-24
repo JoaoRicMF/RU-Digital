@@ -875,6 +875,11 @@ body {
 /* ==========================================================================
    7. RESPONSIVIDADE — TABLET (768px–1023px)
    ========================================================================== */
+   @media (max-width: 1023px) {
+        #btn-sidebar-theme {
+            display: none !important;
+        }
+    }
 @media (min-width: 768px) and (max-width: 1023px) {
 
     /* Container ligeiramente maior, centralizado */
@@ -1312,5 +1317,53 @@ body {
     /* Login: sem border-radius extra */
     #view-login.login-container {
         border-radius: 0;
+    }
+    /* ==========================================================================
+   10. MODO ESCURO (DARK MODE)
+   ========================================================================== */
+body.dark-mode {
+    background-color: #0d1117;
+    --bg-color: #161b22;
+    --card-bg: #21262d;
+    --text-dark: #e6edf3;
+    --text-light: #8b949e;
+    --border-color: #30363d;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+    /* Modificações específicas para o Dark Mode */
+    body.dark-mode .app-container { box-shadow: 0 0 20px rgba(0,0,0,0.8); }
+    body.dark-mode .app-header, 
+    body.dark-mode .bottom-nav { border-color: var(--border-color); }
+    body.dark-mode .card { border-color: var(--border-color); }
+    body.dark-mode .menu-highlight { background-color: #161b22; border-color: var(--border-color); }
+    body.dark-mode .meal-toggle { background: var(--border-color); }
+    body.dark-mode .meal-btn { color: var(--text-light); }
+    body.dark-mode .day-btn { background: var(--border-color); color: var(--text-light); }
+    body.dark-mode .menu-list li { border-color: var(--border-color); color: var(--text-dark); }
+    body.dark-mode .menu-list li strong { color: #fff; }
+    body.dark-mode .extrato-box { background-color: #161b22; border: 1px solid var(--border-color); }
+    body.dark-mode .transaction-item { border-color: var(--border-color); }
+    body.dark-mode .trans-expense { color: var(--text-light); }
+    body.dark-mode .trans-income { color: #56d364; } /* Verde mais vibrante para contraste */
+    body.dark-mode .comment-box { background-color: #161b22; border-color: var(--border-color); color: var(--text-dark); }
+    body.dark-mode .profile-item-header { border-color: var(--border-color); color: #fff; }
+    body.dark-mode .profile-item { border-color: var(--border-color); color: var(--text-dark); }
+    body.dark-mode .login-container { background: linear-gradient(180deg, #161b22 0%, #0d1117 100%); }
+    body.dark-mode .login-box-modern { background: var(--card-bg); box-shadow: 0 10px 25px rgba(0,0,0,0.6); }
+    body.dark-mode .login-input-modern, 
+    body.dark-mode .form-input { background: #0d1117; border-color: var(--border-color); color: var(--text-dark); }
+    body.dark-mode .login-input-modern:focus,
+    body.dark-mode .form-input:focus { background: #161b22; }
+    body.dark-mode .modal-content { background: var(--card-bg); border-color: var(--border-color); }
+    body.dark-mode .modal-header { border-color: var(--border-color); }
+    body.dark-mode .nutri-row { border-color: var(--border-color); color: var(--text-dark); }
+    body.dark-mode .notification-item { border-color: var(--border-color); color: var(--text-dark); }
+    body.dark-mode .sidebar-footer { background: #161b22; border-color: var(--border-color); }
+    body.dark-mode .btn-admin-modern { border-color: var(--border-color); color: var(--text-light); }
+    body.dark-mode .btn-admin-modern:hover { background: #30363d; color: #fff; }
+    body.dark-mode .skeleton-text, body.dark-mode .skeleton, body.dark-mode .skel-box {
+    background: linear-gradient(90deg, #30363d 25%, #424a53 50%, #30363d 75%);
+    background-size: 200% 100%;
     }
 }

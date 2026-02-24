@@ -11,6 +11,46 @@ document.addEventListener('DOMContentLoaded', () => {
      * - Injeta o JWT no header Authorization automaticamente
      * - Lança um erro com a mensagem da API se o status não for 2xx
      */
+
+    // ----------------------------------------------------------
+    // THEME (MODO ESCURO)
+    // ----------------------------------------------------------
+    function applyTheme(theme) {
+        const isDark = theme === 'dark';
+        document.body.classList.toggle('dark-mode', isDark);
+        
+        // Trocar ícones
+        const headerIcon = document.getElementById('btn-theme-toggle');
+        const profileIcon = document.getElementById('profile-theme-icon');
+        const sidebarIcon = document.getElementById('sidebar-theme-icon');
+        
+        // Trocar textos
+        const profileText = document.getElementById('profile-theme-text');
+        const sidebarText = document.getElementById('sidebar-theme-text');
+        
+        if (headerIcon) headerIcon.className = isDark ? 'fa-solid fa-sun header-icon' : 'fa-solid fa-moon header-icon';
+        if (profileIcon) profileIcon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        if (sidebarIcon) sidebarIcon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        
+        const textoModo = isDark ? 'Modo Claro' : 'Modo Escuro';
+        if (profileText) profileText.textContent = textoModo;
+        if (sidebarText) sidebarText.textContent = textoModo;
+    }
+
+    // Inicialização
+    const currentTheme = localStorage.getItem('ru_theme') || 'light';
+    applyTheme(currentTheme);
+
+    function toggleTheme() {
+        const newTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+        localStorage.setItem('ru_theme', newTheme);
+        applyTheme(newTheme);
+    }
+
+    document.getElementById('btn-theme-toggle')?.addEventListener('click', toggleTheme);
+    document.getElementById('btn-profile-theme')?.addEventListener('click', toggleTheme);
+    document.getElementById('btn-sidebar-theme')?.addEventListener('click', toggleTheme);
+
     async function apiFetch(endpoint, options = {}) {
         const token = localStorage.getItem('ru_jwt_token');
 
@@ -33,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         return data; // { status: 'success', data: { ... } }
+        
     }
 
 
