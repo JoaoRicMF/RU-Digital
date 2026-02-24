@@ -13,39 +13,36 @@
 <div class="app-container">
 
     <section id="view-login" class="login-container">
-        <div class="login-logo-card">
+        <div class="login-box-modern">
             <img src="assets/img/OIP.webp" alt="Logo UFCAT" class="login-img">
-            <h3 class="login-title">Acesso RU Digital</h3>
+            <h1 class="login-title">Acesso RU Digital</h1>
+            
+            <div class="login-input-wrapper">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" id="login-email" class="login-input-modern" placeholder="joao@ufcat.edu.br">
+            </div>
+            
+            <div class="login-input-wrapper">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" id="login-password" class="login-input-modern" placeholder="••••••••">
+            </div>
+            
+            <p id="login-error" class="error-text-dark d-none">Credenciais inválidas.</p>
+            
+            <button id="btn-login" class="btn-login-modern">Entrar</button>
+            
+            <div class="login-links">
+                <button id="btn-forgot-password" class="btn-forgot-modern">Esqueci minha senha</button>
+                
+                <div class="login-divider"></div>
+                
+                <a href="admin.html" class="btn-admin-modern">
+                    <i class="fa-solid fa-shield-halved"></i> Acesso Administrativo
+                </a>
+            </div>
         </div>
         
-        <input type="email" id="login-email" class="login-input" placeholder="joao@ufcat.edu.br">
-        <input type="password" id="login-password" class="login-input" placeholder="••••••">
-        
-        <p id="login-error" class="error-text d-none">Credenciais inválidas.</p>
-        
-        <button id="btn-login" class="btn-text">Entrar</button>
-        <button id="btn-forgot-password" class="btn-forgot">Esqueci minha senha</button>
-        <div style="text-align: center; margin-top: 1rem;">
-    <a href="admin.html" 
-       style="
-           display: inline-flex;
-           align-items: center;
-           gap: .4rem;
-           color: #64748b;
-           font-size: .82rem;
-           text-decoration: none;
-           padding: .4rem .9rem;
-           border: 1px solid #e2e8f0;
-           border-radius: 7px;
-           transition: all .2s;
-       "
-       onmouseover="this.style.background='#f1f5f9'"
-       onmouseout="this.style.background='transparent'"
-    >
-        <i class="fa-solid fa-shield-halved"></i>
-        Acesso Administrativo
-    </a>
-</div>
+        <p class="login-footer-text">© 2026 UFCAT — Restaurante Universitário</p>
     </section>
 
     <header id="app-header" class="app-header d-none">

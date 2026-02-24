@@ -601,8 +601,13 @@
     });
 
     document.getElementById('btn-admin-logout').addEventListener('click', () => {
+        // Apaga TODOS os tokens para garantir o logout completo
         localStorage.removeItem('ru_admin_token');
-        checkAuth();
+        localStorage.removeItem('ru_jwt_token');
+        localStorage.removeItem('ru_user_data');
+    
+        // Redireciona de volta para a tela de login principal
+        window.location.href = 'index.html';
     });
 
     // ── Navegação ────────────────────────────────────────────────
