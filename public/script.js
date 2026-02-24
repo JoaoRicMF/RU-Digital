@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ email, senha }),
             });
 
-            localStorage.setItem('ru_jwt_token', resp.data.token);
+            localStorage.setItem('ru_jwt_token', resp.token);
             appState.user.balance = resp.data.usuario.saldo;
             checkAuth();
 

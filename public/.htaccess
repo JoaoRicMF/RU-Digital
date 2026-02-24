@@ -7,12 +7,16 @@ Options -Indexes
 
 RewriteEngine On
 
-# Permite acesso direto a arquivos existentes (ex: assets)
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+# Permite acesso direto a arquivos e diretórios existentes (assets, css, js, html)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
 
-# Redireciona todo o resto para o Front Controller
-RewriteRule ^ index.php [QSA,L]
+# Redireciona apenas rotas /api/* para o Front Controller
+RewriteRule ^api(/.*)?$ index.php [QSA,L,NC]
+
+# Qualquer outra rota desconhecida → index.html (SPA fallback)
+RewriteRule ^ index.html [L]
 
 # Cabeçalhos de segurança
 <IfModule mod_headers.c>

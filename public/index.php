@@ -63,14 +63,22 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $basePath = dirname($_SERVER['SCRIPT_NAME']);
 
 // Remove a pasta base da URL
-if (strpos($uri, $basePath) === 0) {
+if ($basePath !== '/' && stripos($uri, $basePath) === 0) {
     $uri = substr($uri, strlen($basePath));
 }
 
-// Remove o /api do começo do caminho, se houver
-if (strpos($uri, '/api') === 0) {
-    $uri = substr($uri, 4);
+// Garante que somente rotas /api/* sejam processadas aqui.
+// Qualquer outra coisa que chegou ao PHP (ex: arquivo estático inexistente)
+// recebe 404 limpo, sem entrar no roteador da API.
+if (strpos($uri, '/api') !== 0) {
+    http_response_code(404);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['status' => 'error', 'mensagem' => 'Recurso não encontrado.', 'codigo' => 404]);
+    exit;
 }
+
+// Remove o /api do começo do caminho
+$uri = substr($uri, 4);
 
 // Normaliza a URI para o formato final
 $uri = rtrim($uri, '/') ?: '/';
