@@ -1,0 +1,28 @@
+# =============================================================
+#  public/.htaccess
+#  Redireciona todas as requisições para o index.php (Front Controller)
+#  e aplica cabeçalhos de segurança.
+# =============================================================
+
+Options -Indexes
+
+# Força HTTPS em produção
+# RewriteCond %{HTTPS} off
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+RewriteEngine On
+
+# Permite acesso direto a arquivos existentes (ex: assets)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Redireciona todo o resto para o Front Controller
+RewriteRule ^ index.php [QSA,L]
+
+# Cabeçalhos de segurança
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options    "nosniff"
+    Header always set X-Frame-Options           "DENY"
+    Header always set Referrer-Policy           "no-referrer"
+    Header always set X-XSS-Protection          "1; mode=block"
+</IfModule>

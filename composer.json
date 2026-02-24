@@ -1,0 +1,18 @@
+{
+    "name": "ufcat/ru-digital-api",
+    "description": "Backend PHP da API do RU Digital — UFCAT",
+    "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "firebase/php-jwt": "^6.0",
+        "vlucas/phpdotenv": "^5.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}
