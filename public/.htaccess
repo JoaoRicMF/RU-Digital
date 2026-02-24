@@ -1,21 +1,21 @@
 DirectoryIndex index.html index.php
 Options -Indexes
 
-# Força HTTPS em produção
-# RewriteCond %{HTTPS} off
-# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
 RewriteEngine On
 
-# Permite acesso direto a arquivos e diretórios existentes (assets, css, js, html)
+# 1. CORREÇÃO PARA O TOKEN JWT (Repassa o cabeçalho Authorization para o PHP)
+RewriteCond %{HTTP:Authorization} ^(.*)
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%1]
+
+# 2. PERMITE ACESSO DIRETO (Se o arquivo ou pasta existir, abre ele diretamente)
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Redireciona apenas rotas /api/* para o Front Controller
+# 3. ROTAS DA API (Tudo que começa com /api vai para o index.php)
 RewriteRule ^api(/.*)?$ index.php [QSA,L,NC]
 
-# Qualquer outra rota desconhecida → index.html (SPA fallback)
+# 4. SPA FALLBACK (Qualquer outra rota vai para o index.html da interface)
 RewriteRule ^ index.html [L]
 
 # Cabeçalhos de segurança
@@ -23,5 +23,5 @@ RewriteRule ^ index.html [L]
     Header always set X-Content-Type-Options    "nosniff"
     Header always set X-Frame-Options           "DENY"
     Header always set Referrer-Policy           "no-referrer"
-    Header always set X-XSS-Protection "1; mode=block"
+    Header always set X-XSS-Protection          "1; mode=block"
 </IfModule>

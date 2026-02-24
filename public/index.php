@@ -35,7 +35,8 @@ $dotenv = Dotenv::createImmutable($envPath);
 $dotenv->load();
 
 // Valida variáveis obrigatórias
-$dotenv->required(['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASS', 'JWT_SECRET'])->notEmpty();
+$dotenv->required(['DB_HOST', 'DB_NAME', 'DB_USER', 'JWT_SECRET'])->notEmpty();
+$dotenv->required(['DB_PASS']);
 
 // ------------------------------------------------------------------
 // 2. TIMEZONE
