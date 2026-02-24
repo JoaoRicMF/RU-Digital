@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Requisições paralelas para melhor performance
             const [saldoResp, extratoResp] = await Promise.all([
                 apiFetch('/saldo'),
-                apiFetch('/extrato?limit=10'),
+                apiFetch('/extrato?limit=5'),
             ]);
 
             appState.user.balance     = saldoResp.data.saldo;
@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Atualiza extrato com skeleton
             renderTransactionsSkeleton();
-            const extratoResp = await apiFetch('/extrato?limit=10');
+            const extratoResp = await apiFetch('/extrato?limit=5');
             appState.transactions = extratoResp.data.transacoes;
             renderTransactions();
 
@@ -607,6 +607,53 @@ document.addEventListener('DOMContentLoaded', () => {
         showLogin();
     });
 
+    // ----------------------------------------------------------
+    // IMPLEMENTAÇÃO DOS MENUS DE CONFIGURAÇÃO (PERFIL)
+    // ----------------------------------------------------------
+    
+    // Mapeamento dos botões para os modais correspondentes
+    const profileMenuActions = [
+        { btnId: 'btn-profile-data',     modalId: 'modal-personal-data',   closeId: 'close-personal-data' },
+        { btnId: 'btn-profile-password', modalId: 'modal-change-password', closeId: 'close-change-password' },
+        { btnId: 'btn-profile-terms',    modalId: 'modal-terms',           closeId: 'close-terms' },
+        { btnId: 'btn-profile-about',    modalId: 'modal-about',           closeId: 'close-about' }
+    ];
+
+    profileMenuActions.forEach(action => {
+        // Evento de abrir o modal
+        document.getElementById(action.btnId)?.addEventListener('click', () => {
+            
+            // Lógica Especial: Se for o modal de Dados Pessoais, injeta os dados reais do localStorage
+            if (action.btnId === 'btn-profile-data') {
+                const userData = JSON.parse(localStorage.getItem('ru_user_data') || '{}');
+                const jwtPayload = appState.jwtPayload || {};
+                
+                // Preenche os campos (read-only style)
+                document.getElementById('pd-name').textContent = jwtPayload.nome || userData.nome || 'Não informado';
+                document.getElementById('pd-email').textContent = userData.email || 'Não informado';
+                document.getElementById('pd-course').textContent = userData.curso || 'Ciência da Computação';
+            }
+
+            // Exibe o modal com a animação Glassmorphism
+            document.getElementById(action.modalId).classList.add('open');
+        });
+
+        // Evento de fechar o modal (Xzinho no canto)
+        document.getElementById(action.closeId)?.addEventListener('click', () => {
+            document.getElementById(action.modalId).classList.remove('open');
+        });
+    });
+
+    // O botão "Notificações" do perfil abre o modal de notificações que já existe no seu HTML
+    document.getElementById('btn-profile-notifications')?.addEventListener('click', () => {
+        document.getElementById('notification-modal').classList.add('open');
+    });
+
+    // Botão extra "Entendido" para fechar os Termos de Uso
+    document.getElementById('btn-accept-terms')?.addEventListener('click', () => {
+        document.getElementById('modal-terms').classList.remove('open');
+    });
+
 
     // ----------------------------------------------------------
     // 11. RECUPERAÇÃO DE SENHA — usa a API real
@@ -659,6 +706,92 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-close-forgot-success')?.addEventListener('click', () => {
         forgotModal.classList.remove('open');
     });
+
+    // ----------------------------------------------------------
+    // LÓGICA DO EXTRATO COMPLETO COM FILTROS
+    // ----------------------------------------------------------
+    const btnFullStatement = document.getElementById('btn-full-statement');
+    const modalFullStatement = document.getElementById('modal-full-statement');
+    const closeFullStatement = document.getElementById('close-full-statement');
+    const fullTransactionList = document.getElementById('full-transaction-list');
+    const filterBtns = document.querySelectorAll('#modal-full-statement .meal-btn');
+    
+    let fullTransactionsData = []; // Cache das transações carregadas
+
+    // 1. Abrir Modal e Carregar Dados
+    btnFullStatement?.addEventListener('click', async () => {
+        modalFullStatement.classList.add('open');
+        fullTransactionList.innerHTML = '<div class="skeleton-text skel-menu">Carregando extrato...</div>';
+        
+        // Repõe o filtro para "Tudo" visualmente
+        filterBtns.forEach(b => b.classList.remove('active'));
+        document.querySelector('#modal-full-statement .meal-btn[data-filter="all"]').classList.add('active');
+
+        try {
+            // A API Backend limita a 50 registos máximos, vamos pedir o limite máximo
+            const resp = await apiFetch('/extrato?limit=50');
+            fullTransactionsData = resp.data.transacoes;
+            renderFullTransactions('all');
+        } catch (err) {
+            fullTransactionList.innerHTML = `<p style="color: red; text-align: center; padding: 20px;">Erro ao carregar: ${err.message}</p>`;
+        }
+    });
+
+    // 2. Fechar Modal
+    closeFullStatement?.addEventListener('click', () => {
+        modalFullStatement.classList.remove('open');
+    });
+
+    // 3. Sistema de Filtros (Pílulas)
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderFullTransactions(btn.getAttribute('data-filter'));
+        });
+    });
+
+    // 4. Renderizar Lista Filtrada com formatação melhorada
+    function renderFullTransactions(filterMode) {
+        fullTransactionList.innerHTML = '';
+        
+        // Filtra os dados com base na pílula ativa
+        const filteredData = fullTransactionsData.filter(t => {
+            if (filterMode === 'income') return t.isIncome;
+            if (filterMode === 'expense') return !t.isIncome;
+            return true; // 'all'
+        });
+
+        if (filteredData.length === 0) {
+            fullTransactionList.innerHTML = '<p style="color:#888; text-align:center; padding:20px; font-size: 0.9rem;">Nenhuma transação encontrada para este filtro.</p>';
+            return;
+        }
+
+        // Constrói as linhas
+        filteredData.forEach(t => {
+            const row = document.createElement('div');
+            row.className = `transaction-item ${t.isIncome ? 'trans-income' : 'trans-expense'}`;
+            
+            // Formatação de data e hora
+            const dateObj = new Date(t.data);
+            const dateStr = dateObj.toLocaleDateString('pt-BR', { day:'2-digit', month:'short' }).toUpperCase();
+            const timeStr = dateObj.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+            
+            // Layout mais avançado para o ecrã completo (Flexbox)
+            row.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <strong style="font-size: 0.95rem; color: var(--text-dark);">${t.descricao}</strong>
+                        <small style="color: #888; font-size: 0.75rem;">${dateStr} às ${timeStr} • ${t.metodo.toUpperCase()}</small>
+                    </div>
+                    <div style="font-weight: 700; font-size: 1.05rem; white-space: nowrap;">
+                        ${t.isIncome ? '+' : '-'} ${currencyFormatter.format(t.valor)}
+                    </div>
+                </div>
+            `;
+            fullTransactionList.appendChild(row);
+        });
+    }
 
 
     // ----------------------------------------------------------

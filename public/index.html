@@ -108,6 +108,7 @@
                 <h2 class="section-title">Extrato Recente</h2>
                 <div class="extrato-box mt-16" id="transaction-list">
                     </div>
+                <button id="btn-full-statement" class="btn-text-link mt-10">Ver extrato completo</button>
             </div>
             
         </section>
@@ -162,11 +163,13 @@
             <div class="card mt-20" style="padding: 10px 20px;">
                 <ul class="profile-menu">
                     <li class="profile-item-header">Configurações</li>
-                    <li class="profile-item"><span>Dados Pessoais</span><i class="fa-solid fa-chevron-right"></i></li>
-                    <li class="profile-item"><span>Alterar Senha</span><i class="fa-solid fa-chevron-right"></i></li>
-                    <li class="profile-item-header mt-10">Notificações</li>
-                    <li class="profile-item"><span>Termos de Uso</span><i class="fa-solid fa-chevron-right"></i></li>
-                    <li class="profile-item"><span>Sobre o RU UFCAT</span><i class="fa-solid fa-chevron-right"></i></li>
+                    <li class="profile-item" id="btn-profile-data"><span>Dados Pessoais</span><i class="fa-solid fa-chevron-right"></i></li>
+                    <li class="profile-item" id="btn-profile-password"><span>Alterar Senha</span><i class="fa-solid fa-chevron-right"></i></li>
+    
+                    <li class="profile-item-header mt-10">Informações</li>
+                    <li class="profile-item" id="btn-profile-notifications"><span>Notificações</span><i class="fa-solid fa-chevron-right"></i></li>
+                    <li class="profile-item" id="btn-profile-terms"><span>Termos de Uso</span><i class="fa-solid fa-chevron-right"></i></li>
+                    <li class="profile-item" id="btn-profile-about"><span>Sobre o RU UFCAT</span><i class="fa-solid fa-chevron-right"></i></li>
                 </ul>
             </div>
 
@@ -276,6 +279,100 @@
                     <p class="forgot-desc">Verifique a caixa de entrada de <strong id="forgot-email-sent"></strong> e siga as instruções para redefinir sua senha.</p>
                 </div>
                 <button id="btn-close-forgot-success" class="btn btn-primary mt-20">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-personal-data" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Dados Pessoais</h3>
+                <i class="fa-solid fa-xmark close-modal" id="close-personal-data"></i>
+            </div>
+            <div class="mt-15">
+                <div class="mb-16">
+                    <label class="balance-label">Nome Completo</label>
+                    <div class="form-input mt-8" id="pd-name" style="background: rgba(0,0,0,0.05); border-color: transparent; font-weight: 500;">Carregando...</div>
+                </div>
+                <div class="mb-16">
+                    <label class="balance-label">E-mail Institucional</label>
+                    <div class="form-input mt-8" id="pd-email" style="background: rgba(0,0,0,0.05); border-color: transparent; font-weight: 500;">Carregando...</div>
+                </div>
+                <div class="mb-16">
+                    <label class="balance-label">Curso</label>
+                    <div class="form-input mt-8" id="pd-course" style="background: rgba(0,0,0,0.05); border-color: transparent; font-weight: 500;">Carregando...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-change-password" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Alterar Senha</h3>
+                <i class="fa-solid fa-xmark close-modal" id="close-change-password"></i>
+            </div>
+            <div class="mt-15">
+                <input type="password" class="form-input mb-16" placeholder="Senha Atual">
+                <input type="password" class="form-input mb-16" placeholder="Nova Senha">
+                <input type="password" class="form-input mb-16" placeholder="Confirmar Nova Senha">
+                <button class="btn btn-primary mt-10" onclick="alert('Funcionalidade de alteração de senha em desenvolvimento.')">Atualizar Senha</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-terms" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Termos de Uso</h3>
+                <i class="fa-solid fa-xmark close-modal" id="close-terms"></i>
+            </div>
+            <div class="mt-15" style="max-height: 400px; overflow-y: auto; color: var(--text-dark); font-size: 0.9rem; line-height: 1.6; padding-right: 10px;">
+                <p><strong>1. Aceitação</strong><br>Ao utilizar a plataforma RU Digital da UFCAT, o utilizador concorda expressamente com as condições aqui descritas.</p>
+                <p class="mt-10"><strong>2. Utilização do Saldo</strong><br>O saldo depositado na carteira virtual é de uso exclusivo no Restaurante Universitário da UFCAT, não sendo passível de transferência para terceiros ou levantamento em numerário.</p>
+                <p class="mt-10"><strong>3. Conduta e Credenciais</strong><br>A conta é pessoal e intransmissível. O utilizador compromete-se a não partilhar a sua palavra-passe com terceiros.</p>
+                <p class="mt-10"><strong>4. Avaliações</strong><br>As avaliações e comentários devem ser feitos de forma respeitosa. O uso de linguagem imprópria poderá resultar na suspensão da conta.</p>
+            </div>
+            <button class="btn btn-primary mt-20" id="btn-accept-terms">Entendido</button>
+        </div>
+    </div>
+
+    <div id="modal-about" class="modal-overlay">
+        <div class="modal-content" style="text-align: center;">
+            <div class="modal-header" style="justify-content: flex-end; border: none; padding-bottom: 0;">
+                <i class="fa-solid fa-xmark close-modal" id="close-about"></i>
+            </div>
+            <img src="assets/img/OIP.webp" alt="Logo UFCAT" style="width: 90px; margin-bottom: 15px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <h2 style="color: var(--primary-color); margin-bottom: 5px; font-weight: 800;">RU Digital</h2>
+            <p style="color: var(--text-light); font-size: 0.9rem; font-weight: 600;">Versão 1.0.0</p>
+            
+            <p class="mt-20" style="color: var(--text-dark); font-size: 0.95rem; line-height: 1.5;">
+                Sistema moderno de gestão de refeitório desenvolvido para a disciplina de <strong>Engenharia de Software</strong> da Universidade Federal de Catalão (UFCAT).
+            </p>
+            
+            <p class="mt-20" style="color: var(--text-light); font-size: 0.8rem;">
+                © 2026 Universidade Federal de Catalão<br>Todos os direitos reservados.
+            </p>
+        </div>
+    </div>
+
+    <div id="modal-full-statement" class="modal-overlay">
+        <div class="modal-content" style="max-width: 480px;">
+            <div class="modal-header">
+                <h3>Extrato Completo</h3>
+                <i class="fa-solid fa-xmark close-modal" id="close-full-statement"></i>
+            </div>
+            
+            <div class="meal-toggle-container mt-10 mb-16">
+                <div class="meal-toggle" style="max-width: 100%;">
+                    <button class="meal-btn active" data-filter="all">Tudo</button>
+                    <button class="meal-btn" data-filter="income"><i class="fa-solid fa-arrow-down" style="color: #4CAF50;"></i> Entradas</button>
+                    <button class="meal-btn" data-filter="expense"><i class="fa-solid fa-arrow-up" style="color: #E53935;"></i> Saídas</button>
+                </div>
+            </div>
+
+            <div class="extrato-box" id="full-transaction-list" style="max-height: 50vh; overflow-y: auto; padding-right: 5px;">
+                <div class="skeleton-text skel-menu">Carregando extrato...</div>
             </div>
         </div>
     </div>

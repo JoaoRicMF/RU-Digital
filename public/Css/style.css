@@ -420,7 +420,26 @@ body {
 .rating-criteria-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: 700; color: var(--text-dark); font-size: 0.95rem; }
 .interactive-stars i { font-size: 1.6rem; color: #ccc; margin-left: 5px; cursor: pointer; transition: color 0.2s; }
 .interactive-stars i.active { color: var(--accent-color); }
-.comment-box { width: 100%; height: 80px; border: none; background-color: #e0e0e0; padding: 15px; border-radius: 8px; resize: none; font-size: 0.9rem; }
+.comment-box { 
+    width: 100%; 
+    min-height: 120px; /* Um pouco mais alta por padrão */
+    border: 1px solid #e0e0e0; 
+    background-color: #f8f9fa; /* Fundo mais claro e suave */
+    padding: 16px; 
+    border-radius: 12px; 
+    resize: none; 
+    font-size: 0.95rem; 
+    color: var(--text-dark);
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Efeito premium ao clicar/digitar na caixa */
+.comment-box:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(46, 125, 117, 0.15);
+}
 
 /* Perfil */
 .profile-header { text-align: center; }
@@ -1006,26 +1025,44 @@ body {
      ───────────────────────────────────────────────────────────────────────── */
     #view-wallet.active {
         display: grid !important;
-        grid-template-columns: 1fr 1.6fr;
+        grid-template-columns: 1fr 1.5fr; /* O extrato fica um pouco mais largo que o saldo */
         gap: 24px;
-        align-items: start;
+        align-items: start; /* Mantém os cards colados ao topo */
     }
 
-    #view-wallet .card { margin-bottom: 0; }
+    #view-wallet .card { 
+        margin-top: 0 !important; /* CORREÇÃO: Remove a margem do mobile que empurrava o card para baixo */
+        margin-bottom: 0; 
+    }
 
     /* ─── CARDÁPIO ────────────────────────────────────────────────────────────
      * Não é um dashboard — precisa de foco.
      * Coluna única centralizada com max-width para legibilidade.
      ───────────────────────────────────────────────────────────────────────── */
-    #view-menu.active {
-        display: flex !important;
-        flex-direction: column;
-        align-items: center;
-        max-width: 740px !important; /* Override do .view.active max-width */
+    #view-wallet.active {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr; /* AMBOS COM A MESMA LARGURA (50/50) */
+        gap: 24px;
+        align-items: stretch; /* Garante que a linha dos cards tenha a mesma altura máxima */
+    }
+    
+    #view-wallet .card { 
+        margin-top: 0 !important; 
+        margin-bottom: 0; 
+        display: flex;
+        flex-direction: column; /* Necessário para distribuir o espaço interno do card */
     }
 
-    #view-menu .card {
-        width: 100%;
+    #view-wallet .card:nth-child(1) .balance-container {
+        flex: 1; /* Funciona como uma mola: preenche todo o espaço vazio do meio do card */
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* Mantém a palavra "Saldo" e os números perfeitamente ao centro verticalmente */
+        margin: 24px 0; /* Dá um respiro elegante entre o título e o botão */
+    }
+
+    #view-wallet .card:nth-child(1) .btn-recharge {
+        margin-top: 0; /* O 'flex: 1' acima já se encarrega de empurrar o botão para o fundo, logo não precisamos de margem aqui */
     }
 
     /* ─── AVALIAÇÃO ───────────────────────────────────────────────────────────
