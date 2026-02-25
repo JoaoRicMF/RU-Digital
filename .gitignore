@@ -1,24 +1,18 @@
-# ==========================================
-#  RU Digital - .gitignore
-# ==========================================
-
-# Dependências do Composer (nunca devem ir para o GitHub)
 /vendor/
 
-# Ficheiros de Variáveis de Ambiente e Segredos
 .env
 .env.*
 !.env.example
+teste-senha.php
+*.sql
+vendor/
 
-# Ficheiros de Log
 *.log
 error_log
 
-# Ficheiros do Sistema Operativo
 .DS_Store
 Thumbs.db
 
-# Ficheiros de IDEs e Editores
 .vscode/
 .idea/
 *.suo
